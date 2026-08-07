@@ -12,7 +12,7 @@ ANALYSIS_IMPORT_ERROR = None
 try:
     import pandas as pd
     from analysis.build import audit_outputs, build, canonical_text_sha256, main
-    from analysis.core import PipelineError
+    from analysis.core import InsufficientCoverageError, PipelineError
     from analysis.pipeline import (
         build_pre_sa_for_case,
         centered_ma3,
@@ -34,7 +34,7 @@ except ModuleNotFoundError as exc:
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ISAN5 = ("TH-30", "TH-31", "TH-34", "TH-40", "TH-41")
+TEST_GEOS = ("TH-30", "TH-31", "TH-34", "TH-40", "TH-41")
 
 # This repo is freshly bootstrapped: derived/sa_pipeline_v3/ has no generated
 # output yet because no data has been collected and X-13 is not installed on
@@ -117,7 +117,7 @@ class PreSeasonalAggregationTests(unittest.TestCase):
             ("K1", "TH-41"): series([5, 5]),
         }
 
-        result = build_pre_sa_for_case(case, raw_map, ISAN5)
+        result = build_pre_sa_for_case(case, raw_map, TEST_GEOS)
 
         pd.testing.assert_series_equal(
             result_series(result),
@@ -141,7 +141,7 @@ class PreSeasonalAggregationTests(unittest.TestCase):
             for member, values in zip(case["members"], member_values)
         }
 
-        result = build_pre_sa_for_case(case, raw_map, ISAN5)
+        result = build_pre_sa_for_case(case, raw_map, TEST_GEOS)
 
         # Skipping the family-level province rebase would yield
         # [100, 58.333..., 75], so this fixture protects the exact T2 order.
@@ -154,15 +154,59 @@ class PreSeasonalAggregationTests(unittest.TestCase):
             atol=1e-10,
         )
 
-    def test_missing_required_province_raises(self):
+    def test_partial_province_coverage_uses_whatever_is_available(self):
+        # Mid-collection: 4 of 5 configured provinces have data. This must
+        # compute from the 4 available ones, not fail closed like a hard
+        # "every province required" gate would - a keyword shouldn't be
+        # blocked from any Tableau output just because one province hasn't
+        # finished its monthly collection round yet.
         case = {"case_id": "K1", "tier": "T1", "members": ["K1"]}
         raw_map = {
             ("K1", geo): series([1, 2])
-            for geo in ISAN5[:-1]
+            for geo in TEST_GEOS[:-1]
         }
 
-        with self.assertRaises(ValueError):
-            build_pre_sa_for_case(case, raw_map, ISAN5)
+        result = build_pre_sa_for_case(case, raw_map, TEST_GEOS)
+
+        # Every available province rebases [1, 2] -> [50, 100] identically,
+        # so the scope mean is [50, 100] before the final rebase (already
+        # at max=100, so it passes through unchanged).
+        pd.testing.assert_series_equal(
+            result_series(result),
+            series([50, 100]),
+            check_dtype=False,
+            check_names=False,
+        )
+        scope_audit = next(a for a in result["audits"] if a["stage"] == "C_SCOPE")
+        # Honestly reports 4 of the full 5-province target, not 4 of 4.
+        self.assertEqual(scope_audit["contributors_n"], 4)
+        self.assertEqual(scope_audit["required_n"], 5)
+
+    def test_no_province_coverage_raises_without_a_fallback_index(self):
+        case = {"case_id": "K1", "tier": "T1", "members": ["K1"]}
+
+        with self.assertRaises(InsufficientCoverageError):
+            build_pre_sa_for_case(case, {}, TEST_GEOS)
+
+    def test_no_province_coverage_reports_no_signal_with_a_fallback_index(self):
+        # Before a keyword's first province lands, it should still get
+        # exactly one NO_SIGNAL row over the scope's canonical months
+        # rather than being silently absent from series.csv.
+        case = {"case_id": "K1", "tier": "T1", "members": ["K1"]}
+        month_index = series([0, 0, 0]).index
+
+        result = build_pre_sa_for_case(case, {}, TEST_GEOS, index=month_index)
+
+        self.assertEqual(result["status"], "NO_SIGNAL")
+        pd.testing.assert_series_equal(
+            result_series(result),
+            series([0, 0, 0]),
+            check_dtype=False,
+            check_names=False,
+        )
+        scope_audit = next(a for a in result["audits"] if a["stage"] == "C_SCOPE")
+        self.assertEqual(scope_audit["contributors_n"], 0)
+        self.assertEqual(scope_audit["required_n"], 5)
 
 
 @unittest.skipIf(ANALYSIS_IMPORT_ERROR, "optional analytical dependencies are not installed")

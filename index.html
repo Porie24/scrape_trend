@@ -423,7 +423,7 @@
       </article>
       <article class="method-item">
         <strong>“อีสาน” เป็นคอมโพสิตคำนวณ</strong>
-        <p>ปรับฐานจังหวัดที่มีสัญญาณในชุด 5 จังหวัด ให้น้ำหนักเท่ากันก่อนเฉลี่ย แล้วปรับค่าสูงสุดเป็น 100; หากใช้ไม่ครบ หน้าเว็บจะแจ้งจำนวนสนับสนุน N/5</p>
+        <p>ปรับฐานจังหวัดที่มีสัญญาณในชุด 20 จังหวัด ให้น้ำหนักเท่ากันก่อนเฉลี่ย แล้วปรับค่าสูงสุดเป็น 100; หากใช้ไม่ครบ หน้าเว็บจะแจ้งจำนวนสนับสนุน N/20</p>
       </article>
     </div>
     <a class="method-link" href="README.md">
@@ -659,7 +659,7 @@
         continue;
       }
       const supportN = finiteNumber(firstValue(raw.support_n, meta.support_n));
-      const supportTotal = finiteNumber(firstValue(raw.support_total, meta.support_total, geo === "ISAN" && supportN !== null ? 5 : null));
+      const supportTotal = finiteNumber(firstValue(raw.support_total, meta.support_total, geo === "ISAN" && supportN !== null ? 20 : null));
       const supportGeos = firstValue(raw.support_geos, meta.support_geos, []);
       const recentZerosRaw = firstValue(meta.recent_zeros, raw.recent_zeros, 0);
       const recentZeros = Array.isArray(recentZerosRaw)
@@ -831,7 +831,7 @@
       appendQualityNote(
         box,
         "คอมโพสิตอีสานครอบคลุมไม่ครบ",
-        `${names} — กราฟยังแสดงตามสูตรเดิม แต่ควรอ่านเป็นสัญญาณจากจังหวัดที่ใช้คำนวณ ไม่ใช่ตัวแทนครบทั้ง 5 จังหวัด`,
+        `${names} — กราฟยังแสดงตามสูตรเดิม แต่ควรอ่านเป็นสัญญาณจากจังหวัดที่ใช้คำนวณ ไม่ใช่ตัวแทนครบทั้ง 20 จังหวัด`,
       );
     }
 

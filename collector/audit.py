@@ -29,7 +29,12 @@ from typing import Any, Iterable, Sequence
 
 
 ROOT = Path(__file__).resolve().parent.parent
-RAW_GEOS = ("TH", "TH-30", "TH-31", "TH-34", "TH-40", "TH-41")
+RAW_GEOS = (
+    "TH",
+    "TH-30", "TH-31", "TH-32", "TH-33", "TH-34", "TH-35", "TH-36", "TH-37",
+    "TH-38", "TH-39", "TH-40", "TH-41", "TH-42", "TH-43", "TH-44", "TH-45",
+    "TH-46", "TH-47", "TH-48", "TH-49",
+)
 SIGNAL_TIERS = ("VERY_GOOD", "ACCEPTABLE", "WEAK")
 MONTH_RE = re.compile(r"^(\d{4})-(\d{2})$")
 CANONICAL_START = "2004-01-01"

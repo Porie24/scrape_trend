@@ -7,8 +7,8 @@
 <ID>__<GEO>.csv พร้อมให้ collector/ingest.py กินทันที
 
 ตัวอย่าง:
-  python collector/make_jobs.py --all                    # 50 คำ x 6 พื้นที่ = 300 jobs
-  python collector/make_jobs.py --ids FP014,FU014
+  python collector/make_jobs.py --all                    # 47 คำ x 21 พื้นที่ = 987 jobs
+  python collector/make_jobs.py --ids FP001,FU001
   python collector/make_jobs.py --group FP --geo TH
 
 นโยบายช่วงเวลา (ข้อมูลหลักของโปรเจค = long horizon): **โหลดยาวสุดเสมอ**
@@ -43,9 +43,24 @@ GEOS = {
     "TH": "ประเทศไทย",
     "TH-30": "นครราชสีมา",
     "TH-31": "บุรีรัมย์",
+    "TH-32": "สุรินทร์",
+    "TH-33": "ศรีสะเกษ",
     "TH-34": "อุบลราชธานี",
+    "TH-35": "ยโสธร",
+    "TH-36": "ชัยภูมิ",
+    "TH-37": "อำนาจเจริญ",
+    "TH-38": "บึงกาฬ",
+    "TH-39": "หนองบัวลำภู",
     "TH-40": "ขอนแก่น",
     "TH-41": "อุดรธานี",
+    "TH-42": "เลย",
+    "TH-43": "หนองคาย",
+    "TH-44": "มหาสารคาม",
+    "TH-45": "ร้อยเอ็ด",
+    "TH-46": "กาฬสินธุ์",
+    "TH-47": "สกลนคร",
+    "TH-48": "นครพนม",
+    "TH-49": "มุกดาหาร",
 }
 CANONICAL_START = "2004-01-01"
 

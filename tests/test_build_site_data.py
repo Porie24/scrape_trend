@@ -4,7 +4,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from collector.build_site_data import build, isan_aggregate
+from collector.audit import RAW_GEOS
+from collector.build_site_data import PROVINCES, build, isan_aggregate
 
 
 class IsanAggregateTests(unittest.TestCase):
@@ -20,7 +21,7 @@ class IsanAggregateTests(unittest.TestCase):
         self.assertEqual(result["values"], [75.0, 100.0])
         self.assertEqual(result["support_n"], 2)
         self.assertEqual(result["support_geos"], ["TH-30", "TH-31"])
-        self.assertEqual(result["support_total"], 5)
+        self.assertEqual(result["support_total"], len(PROVINCES))
 
 
 class BuildSiteDataTests(unittest.TestCase):
@@ -83,7 +84,7 @@ class BuildSiteDataTests(unittest.TestCase):
         self.assertEqual(payload, second_payload)
         self.assertEqual(payload["geos"]["ISAN"], "อีสาน (คอมโพสิต)")
         self.assertEqual(payload["series"]["FP001"]["ISAN"]["support_n"], 2)
-        self.assertEqual(payload["health"]["expected_raw_series"], 6)
+        self.assertEqual(payload["health"]["expected_raw_series"], len(RAW_GEOS))
         self.assertEqual(payload["health"]["available_raw_series"], 2)
         self.assertEqual(payload["health"]["data_end"], "2026-02")
         self.assertEqual(payload["health"]["catalog_updated_at"], "2026-07-01T00:00:00")

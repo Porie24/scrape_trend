@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from collector.check_keyword import check_keyword
+from collector.check_keyword import PROVINCES, check_keyword
 
 
 def month_sequence(count: int, year: int, month: int) -> list[str]:
@@ -34,19 +34,18 @@ class CheckKeywordTest(unittest.TestCase):
             writer.writerows(zip(months, values))
 
     def write_all_provinces(self, keyword_id, live_count, months=100):
-        provinces = ["TH-30", "TH-31", "TH-34", "TH-40", "TH-41"]
-        for index, geo in enumerate(provinces):
+        for index, geo in enumerate(PROVINCES):
             values = [1.0] * months if index < live_count else [0.0] * months
             self.write(keyword_id, geo, values)
 
     def test_full_province_support_suggests_a_standalone_keyword(self):
         self.write("FP900", "TH", [1.0] * 100)
-        self.write_all_provinces("FP900", live_count=5)
+        self.write_all_provinces("FP900", live_count=len(PROVINCES))
 
         result = check_keyword("FP900", self.root)
 
         self.assertTrue(result["national_pass"])
-        self.assertEqual(result["regional_support"], 5)
+        self.assertEqual(result["regional_support"], len(PROVINCES))
         self.assertEqual(result["suggested_tier"], "T1")
 
     def test_partial_province_support_forces_a_family(self):
@@ -117,7 +116,7 @@ class CheckKeywordTest(unittest.TestCase):
 
         self.assertFalse(result["collected"])
         self.assertIsNone(result["suggested_tier"])
-        self.assertIn("1/6", result["reason"])
+        self.assertIn("1/21", result["reason"])
         self.assertIn("TH-30", result["reason"])
 
     def test_incoming_mode_reports_when_nothing_has_arrived(self):

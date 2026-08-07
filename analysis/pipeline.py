@@ -11,6 +11,7 @@ import pandas as pd
 
 from .core import (
     Case,
+    PipelineError,
     SCOPES,
     build_pre_sa_for_case,
     centered_ma3,
@@ -115,6 +116,12 @@ def _build_rows(
     for scope_name, config in SCOPES.items():
         geos, start = tuple(config["geos"]), str(config["start"])
         raw_map = load_scope_raw(root, cases, geos, start)
+        if not raw_map:
+            raise PipelineError(
+                f"no raw data collected yet for scope {scope_name} "
+                f"(geographies: {', '.join(geos)}); collect at least one "
+                "keyword for one geography in this scope before building"
+            )
         index = next(iter(raw_map.values())).index
         scope_metadata[scope_name] = {
             "geographies": list(geos), "required_geographies_n": len(geos),
@@ -123,7 +130,10 @@ def _build_rows(
         }
 
         for case in cases:
-            pre = build_pre_sa_for_case(case, raw_map, geos)
+            # index is always supplied here, so a case with zero collected
+            # geographies still yields exactly one NO_SIGNAL row instead of
+            # raising InsufficientCoverageError - see build_pre_sa_for_case.
+            pre = build_pre_sa_for_case(case, raw_map, geos, index=index)
             adjustment = seasonally_adjust(pre["series"], executable, timeout, fallback)
             sa = adjustment.series.astype(float)
             floored = sa.clip(lower=0)

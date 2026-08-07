@@ -51,7 +51,7 @@ repo นี้รันบน **macOS/Linux** — `scripts/toolkit.sh` เป็
 CI/CD (GitHub Actions สำหรับ validate + deploy Pages) ยังไม่ได้ตั้งใน repo นี้ — เป็นงานที่เหลือก่อน publish จริง
 
 พื้นที่: `TH` ประเทศไทย, `TH-30` นครราชสีมา, `TH-31` บุรีรัมย์, `TH-34` อุบลราชธานี, `TH-40` ขอนแก่น, `TH-41` อุดรธานี
-พื้นที่พิเศษ `ISAN` (อีสานคอมโพสิต) = ซีรีส์ derived ใน `build_site_data.py` (rebase จังหวัดที่มีค่าสูงสุด >0 → เฉลี่ยน้ำหนักเท่ากัน → rebase max=100) **เก็บ/ingest ไม่ได้** มันคำนวณใหม่เองทุกครั้งที่ rebuild data.js และแนบ `support_n`, `support_total=5`, `support_geos` ไว้ทุกเส้น จึงต้องรายงานเป็น `N/5`; ห้ามเรียกว่า "รวม 5 จังหวัด" หาก support ไม่ครบ
+พื้นที่พิเศษ `ISAN` (อีสานคอมโพสิต) = ซีรีส์ derived ใน `build_site_data.py` (rebase จังหวัดที่มีค่าสูงสุด >0 → เฉลี่ยน้ำหนักเท่ากัน → rebase max=100) **เก็บ/ingest ไม่ได้** มันคำนวณใหม่เองทุกครั้งที่ rebuild data.js และแนบ `support_n`, `support_total=20`, `support_geos` ไว้ทุกเส้น จึงต้องรายงานเป็น `N/20`; ห้ามเรียกว่า "รวม 20 จังหวัด" หาก support ไม่ครบ
 
 ## Taxonomy คำค้น
 

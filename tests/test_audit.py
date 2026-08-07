@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from collector.audit import audit_dataset, classify_signal, evaluate_gates
+from collector.audit import RAW_GEOS, audit_dataset, classify_signal, evaluate_gates
 
 
 def month_sequence(count, start_year=2020, start_month=1):
@@ -113,13 +113,14 @@ class AuditDatasetTests(unittest.TestCase):
 
         report = audit_dataset(self.root)
 
+        written = {"TH", "TH-30", "TH-31", "TH-34"}
+        expected_missing = [f"FP001__{geo}" for geo in RAW_GEOS if geo not in written]
+
         self.assertTrue(report["structural_ok"])
-        self.assertEqual(report["expected_raw_series"], 6)
-        self.assertEqual(report["available_raw_series"], 4)
-        self.assertEqual(report["missing_raw_series"], 2)
-        self.assertEqual(
-            report["missing_raw_series_keys"], ["FP001__TH-40", "FP001__TH-41"]
-        )
+        self.assertEqual(report["expected_raw_series"], len(RAW_GEOS))
+        self.assertEqual(report["available_raw_series"], len(written))
+        self.assertEqual(report["missing_raw_series"], len(expected_missing))
+        self.assertEqual(report["missing_raw_series_keys"], expected_missing)
         self.assertEqual(report["all_zero_raw_series"], 1)
         self.assertEqual(report["per_series"]["FP001__TH"]["status"], "available")
         self.assertEqual(report["per_series"]["FP001__TH"]["signal_status"], "ALL_ZERO")
@@ -146,14 +147,15 @@ class AuditDatasetTests(unittest.TestCase):
     def test_valid_confirmed_no_data_completes_release_gate(self):
         months = month_range("2004-01", "2026-06")
         self.write_series("TH", [1] * len(months), months=months)
-        for geo in ("TH-30", "TH-31", "TH-34", "TH-40", "TH-41"):
+        provinces = [geo for geo in RAW_GEOS if geo != "TH"]
+        for geo in provinces:
             self.write_no_data(geo)
         self.save_catalog()
         report = audit_dataset(self.root)
 
         gate = evaluate_gates(report, strict=True, require_latest="2026-06")
         self.assertTrue(report["structural_ok"])
-        self.assertEqual(report["confirmed_no_data_raw_series"], 5)
+        self.assertEqual(report["confirmed_no_data_raw_series"], len(provinces))
         self.assertEqual(report["missing_raw_series"], 0)
         self.assertEqual(report["per_series"]["FP001__TH-30"]["status"], "no_data")
         self.assertEqual(report["per_series"]["FP001__TH-30"]["signal_status"], "NO_DATA")
@@ -200,7 +202,7 @@ class AuditDatasetTests(unittest.TestCase):
 
         self.assertFalse(gate["pass"])
         self.assertEqual(gate["stale_available_raw_series"], 0)
-        self.assertEqual(gate["missing_raw_series"], 5)
+        self.assertEqual(gate["missing_raw_series"], len(RAW_GEOS) - 1)
         self.assertEqual(gate["invalid_no_data_raw_series"], 0)
 
     def test_truncated_canonical_start_is_a_structural_error(self):

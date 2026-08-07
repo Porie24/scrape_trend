@@ -11,15 +11,28 @@ import numpy as np
 import pandas as pd
 
 
-ISAN5 = ("TH-30", "TH-31", "TH-34", "TH-40", "TH-41")
+ISAN20 = (
+    "TH-30", "TH-31", "TH-32", "TH-33", "TH-34", "TH-35", "TH-36", "TH-37",
+    "TH-38", "TH-39", "TH-40", "TH-41", "TH-42", "TH-43", "TH-44", "TH-45",
+    "TH-46", "TH-47", "TH-48", "TH-49",
+)
 SCOPES = {
     "TH": {"geos": ("TH",), "start": "2011-01"},
-    "REG_ISAN5": {"geos": ISAN5, "start": "2014-01"},
+    "REG_ISAN20": {"geos": ISAN20, "start": "2014-01"},
 }
 
 
 class PipelineError(RuntimeError):
     """A deterministic input, environment, or analytical build failure."""
+
+
+class InsufficientCoverageError(PipelineError):
+    """No geography in a case's scope has been collected yet.
+
+    Distinct from PipelineError so callers can tell "nothing to compute
+    yet" apart from a genuine data/validation bug (e.g. a month mismatch
+    among the geographies that *were* collected, which must still fail
+    loudly rather than being treated as just-not-collected-yet)."""
 
 
 @dataclass(frozen=True)
@@ -156,26 +169,58 @@ def build_pre_sa_for_case(
     case: Case | Mapping[str, Any],
     raw_map: Mapping[tuple[str, str], pd.Series],
     scope: Sequence[str],
+    index: pd.DatetimeIndex | None = None,
 ) -> dict[str, Any]:
-    """Apply mentor-v3 A/B/C rebases before seasonal adjustment."""
+    """Apply mentor-v3 A/B/C rebases before seasonal adjustment.
+
+    Uses whichever geographies in `scope` have raw data for every member of
+    `case` - a geography still mid-collection is excluded, never padded.
+    `Geo_Support_N`/`Geo_Support_Total` (the C_SCOPE contributors_n/required_n
+    audit) is reported against the *full configured* scope regardless of how
+    many geographies were actually available, so partial collection reads
+    honestly as partial rather than as artificially "complete."
+
+    Raises InsufficientCoverageError only when not one configured geography
+    has data for this case yet - unless `index` is supplied, in which case
+    that case is reported as NO_SIGNAL over `index` instead (this is what
+    the pipeline caller passes, matching the scope's canonical month range,
+    so every case still gets exactly one row per scope even before its
+    first province lands)."""
 
     case = _as_case(case)
     geos = tuple(scope)
     if not geos:
         raise ValueError("scope must contain at least one geography")
-    selected: dict[str, pd.Series] = {}
-    for member in case.members:
-        for geo in geos:
-            key = (member, geo)
-            if key not in raw_map:
-                raise ValueError(f"missing required source {member}__{geo}")
-            selected[f"{member}__{geo}"] = raw_map[key]
+    available_geos = tuple(
+        geo for geo in geos
+        if all((member, geo) in raw_map for member in case.members)
+    )
+    if not available_geos:
+        if index is None:
+            raise InsufficientCoverageError(
+                f"no geography in scope has data yet for {case.case_id}"
+            )
+        zero = pd.Series(0.0, index=pd.DatetimeIndex(index))
+        return {
+            "series": zero,
+            "audits": [{
+                "stage": "C_SCOPE", "member_id": "", "geo": "+".join(geos),
+                "status": "NO_SIGNAL", "pre_max": 0.0,
+                "contributors_n": 0, "required_n": len(geos),
+            }],
+            "status": "NO_SIGNAL", "signal_n": 0, "required_n": 0,
+        }
+    selected = {
+        f"{member}__{geo}": raw_map[(member, geo)]
+        for member in case.members
+        for geo in available_geos
+    }
     _validate_same_months(selected)
 
     audits: list[dict[str, Any]] = []
     geo_series: list[pd.Series] = []
     signal_n = 0
-    for geo in geos:
+    for geo in available_geos:
         member_series: list[pd.Series] = []
         for member in case.members:
             rebased, audit = rebase_max100(raw_map[(member, geo)])
@@ -201,14 +246,14 @@ def build_pre_sa_for_case(
     scope_mean = pd.concat(geo_series, axis=1).mean(axis=1)
     result, audit = rebase_max100(scope_mean)
     audits.append({
-        "stage": "C_SCOPE", "member_id": "", "geo": "+".join(geos),
+        "stage": "C_SCOPE", "member_id": "", "geo": "+".join(available_geos),
         "status": audit["status"], "pre_max": audit["pre_max"],
         "contributors_n": sum(float(series.max()) > 0 for series in geo_series),
         "required_n": len(geos),
     })
     return {
         "series": result, "audits": audits, "status": audit["status"],
-        "signal_n": signal_n, "required_n": len(case.members) * len(geos),
+        "signal_n": signal_n, "required_n": len(case.members) * len(available_geos),
     }
 
 
@@ -242,12 +287,23 @@ def read_raw_series(path: Path, start: str) -> pd.Series:
 def load_scope_raw(
     root: Path, cases: Sequence[Case], geos: Sequence[str], start: str,
 ) -> dict[tuple[str, str], pd.Series]:
+    """Load every collected (member, geo) raw series for a scope.
+
+    A geography still mid-collection is simply absent from the result, not
+    an error - build_pre_sa_for_case decides per case what to do with
+    partial coverage. A canonical file that *does* exist but is malformed
+    still fails loudly via read_raw_series/PipelineError, and every loaded
+    series must share the same month range (_validate_same_months) - only
+    "not collected yet" is tolerated, never "collected but inconsistent."
+    """
+
     raw_map: dict[tuple[str, str], pd.Series] = {}
     for member in sorted({member for case in cases for member in case.members}):
         for geo in geos:
             path = root / "data" / "series" / f"{member}__{geo}.csv"
             if not path.is_file():
-                raise PipelineError(f"missing canonical series {path.relative_to(root)}")
+                continue
             raw_map[(member, geo)] = read_raw_series(path, start)
-    _validate_same_months({f"{m}__{g}": s for (m, g), s in raw_map.items()})
+    if raw_map:
+        _validate_same_months({f"{m}__{g}": s for (m, g), s in raw_map.items()})
     return raw_map

@@ -67,7 +67,11 @@ METHOD_CONTRACT = {
     "seasonal_adjustment": "X-13ARIMA-SEATS additive, log=false, outlier=false; zeros become 0.001 only at the SA call",
     "post_sa": "floor at zero -> rebase max100 -> centered MA3 (3,min_periods=1)",
     "all_zero": "preserve as zero and mark NO_SIGNAL",
-    "missing_support": "fail; never pad missing months or geographies",
+    "missing_support": (
+        "never pad a missing month or interpolate a missing geography's series; "
+        "a case uses whichever configured geographies have data (reported honestly "
+        "via Geo_Support_N/Geo_Support_Total) and is NO_SIGNAL if none do yet"
+    ),
     "fallback": "stl",
 }
 QUALITY_CONTRACT = {
@@ -95,15 +99,22 @@ def canonical_text_sha256(path: Path) -> str:
 
 
 def source_digest(root: Path, cases: Sequence[Case]) -> tuple[str, list[Path]]:
+    """Hash whichever canonical raw series are actually collected.
+
+    A member/geo pair that hasn't been collected yet is simply excluded -
+    not an error - but the file *set* still drives the digest, so it
+    changes the moment a new province lands (or an existing one changes),
+    keeping this a real staleness/tamper check rather than a fixed list.
+    """
+
+    geos = sorted({geo for config in SCOPES.values() for geo in config["geos"]})
     files = [root / "keywords.csv"]
     members = sorted({member for case in cases for member in case.members})
     for member in members:
-        for geo in ("TH", "TH-30", "TH-31", "TH-34", "TH-40", "TH-41"):
-            files.append(root / "data" / "series" / f"{member}__{geo}.csv")
-    missing = [path for path in files if not path.is_file()]
-    if missing:
-        sample = ", ".join(str(path.relative_to(root)) for path in missing[:5])
-        raise PipelineError(f"missing canonical source file(s): {sample}")
+        for geo in geos:
+            path = root / "data" / "series" / f"{member}__{geo}.csv"
+            if path.is_file():
+                files.append(path)
     digest = hashlib.sha256()
     for path in files:
         digest.update(path.relative_to(root).as_posix().encode("utf-8"))
@@ -399,7 +410,11 @@ def audit_outputs(root: Path = ROOT, output_dir: Path | None = None) -> dict[str
         for scope, config in SCOPES.items():
             scoped = series[series["Scope"] == scope]
             raw_map = load_scope_raw(root, cases, tuple(config["geos"]), str(config["start"]))
-            expected_months = next(iter(raw_map.values())).index.strftime("%Y-%m").tolist()
+            if not raw_map:
+                errors.append(f"no raw data collected yet for scope {scope}")
+                continue
+            scope_index = next(iter(raw_map.values())).index
+            expected_months = scope_index.strftime("%Y-%m").tolist()
             expected_window = {
                 "geographies": list(config["geos"]),
                 "required_geographies_n": len(config["geos"]),
@@ -415,7 +430,7 @@ def audit_outputs(root: Path = ROOT, output_dir: Path | None = None) -> dict[str
                 if actual_months != expected_months:
                     errors.append(f"{scope}/{case.case_id} monthly support differs from canonical raw")
                     continue
-                pre = build_pre_sa_for_case(case, raw_map, tuple(config["geos"]))
+                pre = build_pre_sa_for_case(case, raw_map, tuple(config["geos"]), index=scope_index)
                 if not np.allclose(
                     case_rows["Input_Rebased"].to_numpy(dtype=float),
                     pre["series"].to_numpy(dtype=float),

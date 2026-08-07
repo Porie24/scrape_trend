@@ -241,7 +241,7 @@ class CanonicalWindowPolicyTests(unittest.TestCase):
 
             unknown_place = root / "FP001__TH.csv"
             unknown_place.write_text(
-                'Month,"สินเชื่อส่วนบุคคล: (เลย)"\n2004-01,1\n', encoding="utf-8"
+                'Month,"สินเชื่อส่วนบุคคล: (เชียงใหม่)"\n2004-01,1\n', encoding="utf-8"
             )
             with self.assertRaisesRegex(ValueError, "ไม่รู้จักพื้นที่"):
                 parse_file(unknown_place, keyword_map, keyword_ids, today=date(2026, 7, 15))

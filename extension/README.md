@@ -22,7 +22,7 @@
 
 1. สร้างคิวงาน:
    ```bash
-   ./scripts/toolkit.sh monthly-prepare                            # ทุกคำทุกพื้นที่ (18 คำ × 6 พื้นที่ = 108 jobs)
+   ./scripts/toolkit.sh monthly-prepare                            # ทุกคำทุกพื้นที่ (47 คำ × 21 พื้นที่ = 987 jobs)
    ./scripts/toolkit.sh monthly-prepare --ids FP001                # เฉพาะบางคำ
    ./scripts/toolkit.sh monthly-prepare --group FP --geo TH
    ```
