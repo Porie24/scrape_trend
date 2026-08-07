@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+incoming/*
+!incoming/.gitkeep
+extension/data/*
+!extension/data/.gitkeep
+.browser-runner/
+.venv/
+.tools/
