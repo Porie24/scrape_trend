@@ -28,7 +28,7 @@ repo นี้รันบน **macOS/Linux** — `scripts/toolkit.sh` เป็
 
 | ที่อยู่ | คืออะไร |
 |---|---|
-| `keywords.csv` | คำค้นที่ใช้งาน (เริ่มต้น 18 คำ seed, ID/คำ/Tier/Segment/Factor) แก้ไฟล์นี้เมื่อเพิ่ม/ถอดคำ |
+| `keywords.csv` | คำค้นที่ใช้งาน (เริ่มต้น 28 คำ seed, ID/คำ/Tier/Segment/Factor) แก้ไฟล์นี้เมื่อเพิ่ม/ถอดคำ |
 | `reference/keywords_tried.csv` | คำที่เคยลองทั้งหมด คอลัมน์ `best_stage` บอกว่าไปไกลสุดขั้นไหน เช็คที่นี่ก่อนเพิ่มคำใหม่เสมอ (เริ่มต้นว่างเปล่า) |
 | `extension/` | ตัวเก็บ production (MV3, มีระบบคิว/retry/CAPTCHA/Import jobs) ติดตั้งครั้งเดียว ดู `extension/README.md` |
 | `extension/data/jobs.json` + `jobs_index.json` | คิวงานของ extension สร้างโดย `make_jobs.py` (generated, ไม่ commit) |

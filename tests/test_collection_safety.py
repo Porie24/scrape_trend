@@ -222,7 +222,7 @@ class CanonicalWindowPolicyTests(unittest.TestCase):
             root = Path(tempdir)
             wrong_keyword = root / "FP001__TH.csv"
             wrong_keyword.write_text(
-                'Month,"บัตรกดเงินสด"\n2004-01,1\n', encoding="utf-8"
+                'Month,"สินเชื่อเงินด่วน"\n2004-01,1\n', encoding="utf-8"
             )
             with self.assertRaisesRegex(ValueError, "ไม่ตรงกับ ID"):
                 parse_file(wrong_keyword, keyword_map, keyword_ids, today=date(2026, 7, 15))
