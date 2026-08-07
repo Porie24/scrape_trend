@@ -27,3 +27,22 @@ FU011,ปัญหาการเงิน+เครียดเรื่อง�
 FU012,เงินกู้ค้างชำระ+กู้แล้วจ่ายไม่ไหว,T1,Formal,Push,FU012,keyword,,,active_current_official
 FU013,ผ่อนบ้านไม่ไหว+สินเชื่อบ้านค้างชำระ+ขอเลื่อนผ่อนบ้าน,T1,Formal,Push,FU013,keyword,,,active_current_official
 FU014,ค่าเช่าค้างจ่าย+จ่ายค่าเช่าไม่ไหว+โดนไล่ที่ไม่จ่ายค่าเช่า,T1,Formal,Push,FU014,keyword,,,active_current_official
+FP015,สินเชื่อ ธ.ก.ส.+สินเชื่อเกษตร,T1,Formal,Pull,FP015,keyword,,,active_current_official
+FU015,หนี้ ธ.ก.ส.+หนี้เกษตร,T1,Formal,Push,FU015,keyword,,,active_current_official
+TP001,จำนำทอง,T1,Informal-Traditional,Pull,TP001,keyword,,,active_current_official
+TP002,จำนำทะเบียนรถ,T1,Informal-Traditional,Pull,TP002,keyword,,,active_current_official
+TP003,ขายฝากที่ดิน,T1,Informal-Traditional,Pull,TP003,keyword,,,active_current_official
+TP004,เงินกู้นอกระบบ,T1,Informal-Traditional,Pull,TP004,keyword,,,active_current_official
+TU001,หนี้นอกระบบ,T1,Informal-Traditional,Push,TU001,keyword,,,active_current_official
+TU002,ดอกเบี้ยโหด,T1,Informal-Traditional,Push,TU002,keyword,,,active_current_official
+TU003,ถูกยึดทรัพย์,T1,Informal-Traditional,Push,TU003,keyword,,,active_current_official
+TU004,ถูกยึดรถ,T1,Informal-Traditional,Push,TU004,keyword,,,active_current_official
+TU005,ขายที่นา,T1,Informal-Traditional,Push,TU005,keyword,,,active_current_official
+NP001,กู้เงินด่วนออนไลน์,T1,Informal-New,Pull,NP001,keyword,,,active_current_official
+NP002,สินเชื่อออนไลน์,T1,Informal-New,Pull,NP002,keyword,,,active_current_official
+NP003,แอปกู้เงิน,T1,Informal-New,Pull,NP003,keyword,,,active_current_official
+NP004,เงินด่วนไม่เช็คบูโร,T1,Informal-New,Pull,NP004,keyword,,,active_current_official
+NU001,หนี้แอปเงินกู้,T1,Informal-New,Push,NU001,keyword,,,active_current_official
+NU002,แอปเงินกู้เถื่อน,T1,Informal-New,Push,NU002,keyword,,,active_current_official
+NU003,โดนข่มขู่ทวงหนี้,T1,Informal-New,Push,NU003,keyword,,,active_current_official
+NU004,โดนหลอกกู้เงินออนไลน์,T1,Informal-New,Push,NU004,keyword,,,active_current_official

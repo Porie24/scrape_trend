@@ -169,9 +169,9 @@ class PreSeasonalAggregationTests(unittest.TestCase):
 class KeywordMetadataTests(unittest.TestCase):
     # The set grows every time a maintainer adds a keyword that passed the
     # screening gates, so pinning the exact counts would fail the suite on a
-    # routine addition. Assert the shape plus a floor instead: 28 is the seed
+    # routine addition. Assert the shape plus a floor instead: 47 is the seed
     # count at this repo's bootstrap, and the set is only ever added to.
-    BASELINE_CASE_COUNT = 28
+    BASELINE_CASE_COUNT = 47
 
     def test_current_keywords_are_all_tiered_and_never_shrink(self):
         cases = load_cases(ROOT / "keywords.csv")

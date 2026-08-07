@@ -162,7 +162,7 @@ Agent ต้องเสนอเฉพาะ `toolkit.sh setup` / `monthly-prep
 
 | ไฟล์ | คืออะไร |
 |---|---|
-| `keywords.csv` | คำค้นที่ใช้งานอยู่ (เริ่มต้น 28 คำ seed ครอบคลุม 6 กลุ่ม Segment×Factor — ดูหัวข้อ "Taxonomy คำค้น" — ยังไม่ผ่านด่านคัดกรองจริงจากข้อมูล เพราะยังไม่มีข้อมูลเก็บ) พร้อม Tier / Segment / Factor |
+| `keywords.csv` | คำค้นที่ใช้งานอยู่ (เริ่มต้น 47 คำ seed ครอบคลุม 6 กลุ่ม Segment×Factor — ดูหัวข้อ "Taxonomy คำค้น" — ยังไม่ผ่านด่านคัดกรองจริงจากข้อมูล เพราะยังไม่มีข้อมูลเก็บ) พร้อม Tier / Segment / Factor |
 | `reference/keywords_tried.csv` | คำค้นที่เคยถูกคิด/ทดสอบทั้งหมด พร้อมคอลัมน์ `best_stage` บอกว่าแต่ละคำไปไกลสุดถึงขั้นไหน (เริ่มต้นว่างเปล่า จะสะสมขึ้นเมื่อทีมคัดกรองคำใหม่ผ่าน `collector/add_keyword.py`) |
 | `data/series/<ID>__<GEO>.csv` | ข้อมูลรายเดือนต่อคำต่อพื้นที่ (`Month,Value`) — ว่างเปล่าจนกว่าจะเก็บรอบแรก |
 | `data/catalog.json` | บันทึกเวลา/ช่วงเก็บและสถานะ `available` หรือ confirmed `no_data` ของแต่ละคู่ |
@@ -184,12 +184,14 @@ Agent ต้องเสนอเฉพาะ `toolkit.sh setup` / `monthly-prep
 |---|---|---|---|
 | `FP` | Formal | สถาบันการเงินในระบบ | Pull — แสวงหาสินเชื่อ/ความช่วยเหลือ |
 | `FU` | Formal | สถาบันการเงินในระบบ | Push — สัญญาณเปราะบาง (ค้างชำระ, ล้มละลาย) |
-| `TP` | Informal-Traditional | นอกระบบดั้งเดิม (จำนำ/ขายฝาก) — ยังไม่มีคำในกลุ่มนี้ | Pull — แสวงหาสินเชื่อ |
-| `TU` | Informal-Traditional | นอกระบบดั้งเดิม — ยังไม่มีคำในกลุ่มนี้ | Push — สัญญาณเปราะบาง |
-| `NP` | Informal-New | ช่องทางดิจิทัลใหม่ (แอปกู้เงิน) — ยังไม่มีคำในกลุ่มนี้ | Pull — แสวงหาสินเชื่อ |
-| `NU` | Informal-New | ช่องทางดิจิทัลใหม่ — ยังไม่มีคำในกลุ่มนี้ | Push — สัญญาณเปราะบาง |
+| `TP` | Informal-Traditional | นอกระบบดั้งเดิม (จำนำ/ขายฝาก) | Pull — แสวงหาสินเชื่อ |
+| `TU` | Informal-Traditional | นอกระบบดั้งเดิม | Push — สัญญาณเปราะบาง |
+| `NP` | Informal-New | ช่องทางดิจิทัลใหม่ (แอปกู้เงิน) | Pull — แสวงหาสินเชื่อ |
+| `NU` | Informal-New | ช่องทางดิจิทัลใหม่ | Push — สัญญาณเปราะบาง |
 
-**ที่มาของ 28 คำ seed**: แปลจาก **Table A.1 "Constructing Google Searches for Household Stress"** ใน [Bellrose, Norman & Royters (RBA Bulletin, Dec 2022) "New Measures of Financial Stress from Non-traditional Data"](https://www.rba.gov.au/publications/bulletin/2022/dec/new-measures-of-financial-stress-from-non-traditional-data.html) — งานต้นฉบับผูก query ด้วย boolean AND/OR/NOT (เช่น `mortgage-problems` = `(mortgage AND default) OR (mortgage AND behind) OR (mortgage AND defer) OR (mortgage AND stress)`); ที่นี่แปลแต่ละแถวเป็นวลีไทยที่ใกล้เคียงแล้วรวมเป็น query เดียวด้วย `+` (Google Trends OR syntax) เช่น `FU013 = ผ่อนบ้านไม่ไหว+สินเชื่อบ้านค้างชำระ+ขอเลื่อนผ่อนบ้าน` หมวด `assistance` ของ paper แปลงเป็น Factor=Pull และหมวด `problems` แปลงเป็น Factor=Push ทุกคำที่แปลจึงอยู่ใน Segment=Formal ล้วน (paper ไม่ครอบคลุมช่องทางนอกระบบ) — `TP/TU/NP/NU` ยังคงไว้ในระบบสำหรับคำที่ทีมจะเพิ่มเองภายหลัง (เช่น จำนำทอง, เงินกู้นอกระบบ, แอปเงินกู้)
+**ที่มาของ seed**: `FP001`–`FU015` (30 คำ) แปลจาก **Table A.1 "Constructing Google Searches for Household Stress"** ใน [Bellrose, Norman & Royters (RBA Bulletin, Dec 2022) "New Measures of Financial Stress from Non-traditional Data"](https://www.rba.gov.au/publications/bulletin/2022/dec/new-measures-of-financial-stress-from-non-traditional-data.html) — งานต้นฉบับผูก query ด้วย boolean AND/OR/NOT (เช่น `mortgage-problems` = `(mortgage AND default) OR (mortgage AND behind) OR (mortgage AND defer) OR (mortgage AND stress)`); ที่นี่แปลแต่ละแถวเป็นวลีไทยที่ใกล้เคียงแล้วรวมเป็น query เดียวด้วย `+` (Google Trends OR syntax) เช่น `FU013 = ผ่อนบ้านไม่ไหว+สินเชื่อบ้านค้างชำระ+ขอเลื่อนผ่อนบ้าน` หมวด `assistance` ของ paper แปลงเป็น Factor=Pull และหมวด `problems` แปลงเป็น Factor=Push (เพิ่ม `FP015`/`FU015` สินเชื่อ/หนี้ ธ.ก.ส. เองเพราะ paper ไม่มีบริบทเกษตร)
+
+`TP`/`TU`/`NP`/`NU` (17 คำ) เป็นช่องว่างที่ paper (บริบทออสเตรเลีย) ไม่ครอบคลุม — ร่างขึ้นเองจากความรู้พื้นที่จริงเรื่องหนี้นอกระบบและแอปเงินกู้ในไทย (จำนำทอง, ขายฝากที่ดิน, เงินกู้นอกระบบ, แอปเงินกู้เถื่อน ฯลฯ) ยังไม่ผ่านด่านคัดกรองเหมือนกันทั้งชุด
 
 การเพิ่มคำใหม่: ให้ Agent เช็ค `reference/keywords_tried.csv`, เพิ่มแถวใน `keywords.csv` ด้วย ID ที่ไม่ซ้ำ (หรือใช้ `collector/add_keyword.py --interactive`) แล้วสร้าง/นำเข้าคิว extension เฉพาะ ID นั้น; ห้ามใช้ pytrends เป็น release path
 
@@ -198,7 +200,7 @@ Agent ต้องเสนอเฉพาะ `toolkit.sh setup` / `monthly-prep
 - ค่าเป็น Google Trends index 0-100 เทียบภายในช่วงเวลาที่ดึงของแต่ละคำและพื้นที่ **ไม่ใช่จำนวนการค้นจริง** และห้ามเทียบขนาดข้ามคำตรงๆ
 - **นโยบายการเก็บ: โหลดยาวสุดเสมอ (2004-01-01 ถึงปัจจุบัน)** ข้อมูลหลักของชุดนี้คือ long horizon
 - **ระดับจังหวัดใช้ได้ตั้งแต่ 2014-01 เท่านั้น** Google ปรับระบบระบุตำแหน่งช่วง 2011-2013 ข้อมูลจังหวัดก่อนหน้านั้นเป็นรู/break เครื่องมือทุกตัวตัดทิ้งให้อัตโนมัติ ระดับประเทศไม่ตัด
-- **ยังไม่มีข้อมูลเก็บ**: `keywords.csv` เป็นชุด seed เริ่มต้น 28 คำที่ร่างไว้ให้ครอบคลุมทั้ง 6 กลุ่ม Segment×Factor ยังไม่ผ่านด่านคัดกรองจริง (`collector/check_keyword.py`) เพราะต้องมีข้อมูลจริงก่อนถึงจะตัดสิน Tier ได้ รอบเก็บข้อมูลแรกควรใช้ `collector/add_keyword.py --finalize` หรือ audit ทวนทุกคำหลังเก็บเสร็จ แล้วตัดคำที่สัญญาณอ่อนออกตามผล ไม่ใช่คงไว้ตามที่ร่างไว้
+- **ยังไม่มีข้อมูลเก็บ**: `keywords.csv` เป็นชุด seed เริ่มต้น 47 คำที่ร่างไว้ให้ครอบคลุมทั้ง 6 กลุ่ม Segment×Factor ยังไม่ผ่านด่านคัดกรองจริง (`collector/check_keyword.py`) เพราะต้องมีข้อมูลจริงก่อนถึงจะตัดสิน Tier ได้ รอบเก็บข้อมูลแรกควรใช้ `collector/add_keyword.py --finalize` หรือ audit ทวนทุกคำหลังเก็บเสร็จ แล้วตัดคำที่สัญญาณอ่อนออกตามผล ไม่ใช่คงไว้ตามที่ร่างไว้
 
 ## ที่มา
 
