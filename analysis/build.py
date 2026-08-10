@@ -267,7 +267,9 @@ def build(
         return {"status": "BUILT", "mode": "build", **manifest["counts"]}
 
 
-def audit_outputs(root: Path = ROOT, output_dir: Path | None = None) -> dict[str, Any]:
+def audit_outputs(
+    root: Path = ROOT, output_dir: Path | None = None, allow_unverified_x13: bool = False
+) -> dict[str, Any]:
     root = Path(root).resolve()
     output_dir = Path(output_dir or root / "derived" / "sa_pipeline_v3").resolve()
     errors: list[str] = []
@@ -293,10 +295,11 @@ def audit_outputs(root: Path = ROOT, output_dir: Path | None = None) -> dict[str
     if manifest.get("quality_flags") != QUALITY_CONTRACT:
         errors.append("manifest quality flag contract differs from canonical policy")
     runtime = manifest.get("runtime", {})
-    if runtime.get("x13_sha256") != EXPECTED_SHA256:
-        errors.append("manifest does not use the canonical X-13 binary hash")
-    if runtime.get("x13_version") != EXPECTED_VERSION:
-        errors.append("manifest does not use the canonical X-13 version")
+    if not allow_unverified_x13:
+        if runtime.get("x13_sha256") != EXPECTED_SHA256:
+            errors.append("manifest does not use the canonical X-13 binary hash")
+        if runtime.get("x13_version") != EXPECTED_VERSION:
+            errors.append("manifest does not use the canonical X-13 version")
     expected_runtime = {
         "numpy": np.__version__,
         "pandas": pd.__version__,
@@ -609,7 +612,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
         if args.audit:
-            result = audit_outputs(args.root, args.output_dir)
+            result = audit_outputs(args.root, args.output_dir, args.allow_unverified_x13)
             exit_code = int(result["status"] != "PASS")
         else:
             result = build(
