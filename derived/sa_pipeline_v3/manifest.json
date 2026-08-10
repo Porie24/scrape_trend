@@ -1,0 +1,114 @@
+{
+  "counts": {
+    "case_scope_series": 152,
+    "cases": 76,
+    "no_signal": 69,
+    "stl_fallback": 7,
+    "t1_cases": 76,
+    "t2_cases": 0,
+    "x13": 76
+  },
+  "files": {
+    "method_log.csv": {
+      "rows": 152,
+      "sha256": "94f1fa67f2b2762aff87a1220a8f838638f719114b67f9f54a89fd121fe17a39"
+    },
+    "quality_flags.csv": {
+      "rows": 152,
+      "sha256": "63e4fda5e43c85a1cf48227125a898fc6096a5eebdca2f7fe08d07918e45c9e8"
+    },
+    "rebase_audit.csv": {
+      "rows": 1333,
+      "sha256": "6e8d438a2f22faad19139b72005d5fe413f5adf8a6b22834d39c86dfaac8884d"
+    },
+    "series.csv": {
+      "rows": 25688,
+      "sha256": "059aceee7516a44fcbae5ffe44fb9e84d6c44209ce9046037d8fba2768ce05b2"
+    },
+    "x13_diagnostics.csv": {
+      "rows": 152,
+      "sha256": "70d3902e21f587fc9ffa779206034752956647cb8f110b683d688f82983363e1"
+    }
+  },
+  "implementation": {
+    "digest_sha256": "78169cfeca001caf58de5369e83039232b99d03249e919058d59938aa0cd3e32",
+    "files": [
+      "analysis/core.py",
+      "analysis/pipeline.py",
+      "analysis/x13.py",
+      "analysis/build.py",
+      "requirements-analysis.txt"
+    ],
+    "hash_normalization": "CRLF->LF"
+  },
+  "method": {
+    "all_zero": "preserve as zero and mark NO_SIGNAL",
+    "fallback": "stl",
+    "missing_support": "never pad a missing month or interpolate a missing geography's series; a case uses whichever configured geographies have data (reported honestly via Geo_Support_N/Geo_Support_Total) and is NO_SIGNAL if none do yet",
+    "post_sa": "floor at zero -> rebase max100 -> centered MA3 (3,min_periods=1)",
+    "pre_sa": "T1 A(member-geo)->mean-geos->C; T2 A(member-geo)->mean-members->B->mean-geos->C",
+    "seasonal_adjustment": "X-13ARIMA-SEATS additive, log=false, outlier=false; zeros become 0.001 only at the SA call"
+  },
+  "quality_flags": {
+    "coverage_status": "FULL when Geo_Support_N equals Geo_Support_Total; otherwise PARTIAL",
+    "diagnostic_status": "X-13 Accept_Status; NOT_AVAILABLE for fallback; NOT_APPLICABLE for no signal",
+    "execution_status": "SUCCESS|FALLBACK|NO_SIGNAL",
+    "geo_support": "required geographies with positive pre-SA signal",
+    "ma3_endpoint_provisional": "TRUE because the latest centered MA3 uses two months",
+    "quality_status": "PASS only for ACCEPTED X-13; REVIEW for conditional/rejected/fallback; NO_SIGNAL explicit"
+  },
+  "runtime": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "scipy": "1.17.1",
+    "statsmodels": "0.14.6",
+    "x13_sha256": "c36025812a95e627d64a7f650c693c0f52b920d011dc53bdde0e9ac294bf5ba2",
+    "x13_version": "1.1 Build 62"
+  },
+  "schema_version": "sa-pipeline-v3-portable-2",
+  "source": {
+    "digest_sha256": "8b79e2dacc1ec260adf3d807f2e7da5ea13281e94c4be68647337ad137ff4934",
+    "files": 1030,
+    "hash_normalization": "CRLF->LF",
+    "keywords_sha256": "b66496835a2e6b34c25b586ca0329a738ecfba76b9f78234b43bb9f891e5dddb"
+  },
+  "windows": {
+    "REG_ISAN20": {
+      "end": "2026-07",
+      "geographies": [
+        "TH-30",
+        "TH-31",
+        "TH-32",
+        "TH-33",
+        "TH-34",
+        "TH-35",
+        "TH-36",
+        "TH-37",
+        "TH-38",
+        "TH-39",
+        "TH-40",
+        "TH-41",
+        "TH-42",
+        "TH-43",
+        "TH-44",
+        "TH-45",
+        "TH-46",
+        "TH-47",
+        "TH-48",
+        "TH-49"
+      ],
+      "months": 151,
+      "required_geographies_n": 20,
+      "start": "2014-01"
+    },
+    "TH": {
+      "end": "2026-07",
+      "geographies": [
+        "TH"
+      ],
+      "months": 187,
+      "required_geographies_n": 1,
+      "start": "2011-01"
+    }
+  }
+}
