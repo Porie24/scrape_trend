@@ -2,32 +2,32 @@
   "counts": {
     "case_scope_series": 152,
     "cases": 76,
-    "no_signal": 69,
+    "no_signal": 63,
     "stl_fallback": 7,
     "t1_cases": 76,
     "t2_cases": 0,
-    "x13": 76
+    "x13": 82
   },
   "files": {
     "method_log.csv": {
       "rows": 152,
-      "sha256": "94f1fa67f2b2762aff87a1220a8f838638f719114b67f9f54a89fd121fe17a39"
+      "sha256": "e27db1a3e8800253a08c6f895f53935b20f3afd0afc6a411e0ce1eaf50c552ac"
     },
     "quality_flags.csv": {
       "rows": 152,
-      "sha256": "63e4fda5e43c85a1cf48227125a898fc6096a5eebdca2f7fe08d07918e45c9e8"
+      "sha256": "fb77b8f996bbe8ac5ecda7402bcb201cec4ee74cb5ecfe079db696865ed4b081"
     },
     "rebase_audit.csv": {
-      "rows": 1333,
-      "sha256": "6e8d438a2f22faad19139b72005d5fe413f5adf8a6b22834d39c86dfaac8884d"
+      "rows": 1417,
+      "sha256": "ebcf2c4d0dab53f66b8fd9e111bbe99b8a689950909952f1547a5e0dac54efeb"
     },
     "series.csv": {
       "rows": 25688,
-      "sha256": "059aceee7516a44fcbae5ffe44fb9e84d6c44209ce9046037d8fba2768ce05b2"
+      "sha256": "c86366902ce9b8549d0baea5ecd79b5ce0cccbf8f57bd5d2368c7d40a9d3f606"
     },
     "x13_diagnostics.csv": {
       "rows": 152,
-      "sha256": "70d3902e21f587fc9ffa779206034752956647cb8f110b683d688f82983363e1"
+      "sha256": "f9f76df2b9f6003777ba232847744c99201a82867b2f11f7e3826ff6a09a9804"
     }
   },
   "implementation": {
@@ -67,8 +67,8 @@
   },
   "schema_version": "sa-pipeline-v3-portable-2",
   "source": {
-    "digest_sha256": "8b79e2dacc1ec260adf3d807f2e7da5ea13281e94c4be68647337ad137ff4934",
-    "files": 1030,
+    "digest_sha256": "09914b2e6af56cc22f24f7b2e1860de0d6dd4395cb7b1ad7b0621c3766f8c63b",
+    "files": 1114,
     "hash_normalization": "CRLF->LF",
     "keywords_sha256": "b66496835a2e6b34c25b586ca0329a738ecfba76b9f78234b43bb9f891e5dddb"
   },
