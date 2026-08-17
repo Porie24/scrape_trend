@@ -57,6 +57,14 @@ PROVINCES = [
 ]
 
 
+TIER1_KEYWORD_IDS = [
+    "TP005", "TP006", "NP005", "FU016", "NP006", "FP021", "FU004",
+]
+# คงที่ตามการยืนยันของผู้ใช้ (ไม่คำนวณสดทุกครั้งที่ build ด้วย check_keyword.py)
+# ตรวจผ่านทั้ง National gate + Regional gate ด้วย collector/check_keyword.py --all
+# ถ้ามีคำใหม่ผ่านเกณฑ์ Tier 1 ในอนาคต ต้องแก้ลิสต์นี้ด้วยมือ
+
+
 def isan_aggregate(geo_map):
     """ซีรีส์รวมภาคอีสาน (derived, ไม่ได้มาจาก Google โดยตรง)
 
@@ -88,6 +96,39 @@ def isan_aggregate(geo_map):
         "support_n": len(support_geos),
         "support_geos": support_geos,
         "support_total": len(PROVINCES),
+    }
+
+
+def composite_index(series, keyword_ids=TIER1_KEYWORD_IDS):
+    """ดัชนีรวม Tier 1: เฉลี่ยเท่าน้ำหนักของเส้น ISAN composite ต่อคำ แล้ว rebase อีกรอบ
+
+    เส้น ISAN composite ของแต่ละคำ (จาก isan_aggregate) rebase peak=100 มาแล้ว
+    จึงเทียบสเกลกันได้ตรงๆ ไม่ต้อง rebase ซ้ำก่อนเฉลี่ย
+
+    ต่างจาก RBA ที่ "บวก" raw relative search volume (คำค้นเยอะครอบงำผลรวม)
+    ที่นี่ใช้ "เฉลี่ยเท่าน้ำหนัก" เพื่อไม่ให้คำใดคำหนึ่งครอบงำดัชนี
+    """
+    lines = []
+    support_ids = []
+    for kid in keyword_ids:
+        agg = series.get(kid, {}).get("ISAN")
+        if not agg or not agg["values"]:
+            continue
+        lines.append(dict(zip(agg["months"], agg["values"])))
+        support_ids.append(kid)
+    if not lines:
+        return None
+    months = sorted(set().union(*[set(line) for line in lines]))
+    mean = [sum(line[m] for line in lines if m in line) / sum(1 for line in lines if m in line) for m in months]
+    mx = max(mean)
+    if mx <= 0:
+        return None
+    return {
+        "months": months,
+        "values": [round(v / mx * 100, 1) for v in mean],
+        "support_n": len(support_ids),
+        "support_ids": support_ids,
+        "support_total": len(keyword_ids),
     }
 
 
@@ -141,6 +182,7 @@ def build_payload(root=ROOT):
             for r in keywords
         ],
         "series": series,
+        "composite_index": composite_index(series),
         "health": audit_dataset(root),
     }
 

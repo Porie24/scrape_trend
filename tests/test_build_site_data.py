@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from collector.audit import RAW_GEOS
-from collector.build_site_data import PROVINCES, build, isan_aggregate
+from collector.build_site_data import PROVINCES, build, composite_index, isan_aggregate
 
 
 class IsanAggregateTests(unittest.TestCase):
@@ -22,6 +22,35 @@ class IsanAggregateTests(unittest.TestCase):
         self.assertEqual(result["support_n"], 2)
         self.assertEqual(result["support_geos"], ["TH-30", "TH-31"])
         self.assertEqual(result["support_total"], len(PROVINCES))
+
+
+class CompositeIndexTests(unittest.TestCase):
+    def test_equal_weight_average_then_rebase(self):
+        series = {
+            "KW1": {"ISAN": {"months": ["2026-01", "2026-02"], "values": [100.0, 50.0]}},
+            "KW2": {"ISAN": {"months": ["2026-01", "2026-02"], "values": [0.0, 100.0]}},
+        }
+
+        result = composite_index(series, keyword_ids=["KW1", "KW2"])
+
+        # mean = [50.0, 75.0] -> rebase to max(75.0) = 100
+        self.assertEqual(result["values"], [66.7, 100.0])
+        self.assertEqual(result["support_n"], 2)
+        self.assertEqual(result["support_ids"], ["KW1", "KW2"])
+        self.assertEqual(result["support_total"], 2)
+
+    def test_missing_keyword_is_skipped_not_fatal(self):
+        series = {
+            "KW1": {"ISAN": {"months": ["2026-01"], "values": [100.0]}},
+        }
+
+        result = composite_index(series, keyword_ids=["KW1", "KW_MISSING"])
+
+        self.assertEqual(result["support_ids"], ["KW1"])
+        self.assertEqual(result["support_total"], 2)
+
+    def test_no_data_returns_none(self):
+        self.assertIsNone(composite_index({}, keyword_ids=["KW1"]))
 
 
 class BuildSiteDataTests(unittest.TestCase):
@@ -84,6 +113,7 @@ class BuildSiteDataTests(unittest.TestCase):
         self.assertEqual(payload, second_payload)
         self.assertEqual(payload["geos"]["ISAN"], "อีสาน (คอมโพสิต)")
         self.assertEqual(payload["series"]["FP001"]["ISAN"]["support_n"], 2)
+        self.assertIsNone(payload["composite_index"])  # FP001 ไม่ใช่คำ Tier 1
         self.assertEqual(payload["health"]["expected_raw_series"], len(RAW_GEOS))
         self.assertEqual(payload["health"]["available_raw_series"], 2)
         self.assertEqual(payload["health"]["data_end"], "2026-02")
