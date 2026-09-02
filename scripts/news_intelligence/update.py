@@ -111,11 +111,22 @@ def update_incremental():
 
 # --- phrase extraction (same logic as the exploratory scratchpad version) ---
 
-STOPWORDS = set("""
-ที่ และ ใน กับ ของ ให้ จาก เป็น มี ได้ ไป มา แล้ว ไม่ จะ ก็ ต่อ ยัง อยู่ ว่า นี้ นั้น
-เพื่อ ถึง โดย หรือ แต่ ซึ่ง ตาม กว่า อีก ทั้ง เมื่อ คือ อย่าง ต้อง สำหรับ
-แม้ หาก ถ้า เพราะ จึง ทำให้ ขณะ ทั้งนี้ เหตุ ดัง ส่วน อีกทั้ง หลัง ก่อน
-""".split())
+# Use pythainlp's own maintained stopword corpus (1,030 words) rather than a
+# hand-typed list — a hand-typed list is exactly how "แม้" slipped through
+# and produced nonsense phrase fragments (reported and fixed once already;
+# switching to the standard corpus fixes the whole class of bug, not just
+# the one word that happened to get noticed).
+# Words the standard corpus treats as generic stopwords but that are load-
+# bearing in this domain — e.g. "นอก" is a stopword in general Thai, but it's
+# half of "นอกระบบ" (informal debt), one of the two keywords that survived
+# out-of-sample testing earlier in this project. Filtering it out here would
+# silently break "นอกระบบ"/"หนี้นอกระบบ" phrase reconstruction.
+STOPWORD_EXCEPTIONS = {"นอก"}
+
+
+def _load_stopwords():
+    from pythainlp.corpus import thai_stopwords
+    return set(thai_stopwords()) - STOPWORD_EXCEPTIONS
 
 # Categories are anchored to two research sources already cited in this
 # project (summary_memo.html section 1.1 + this conversation):
@@ -170,9 +181,15 @@ def classify(text):
     return "other"
 
 
+_STOPWORDS_CACHE = None
+
+
 def is_content_token(t):
+    global _STOPWORDS_CACHE
+    if _STOPWORDS_CACHE is None:
+        _STOPWORDS_CACHE = _load_stopwords()
     t = t.strip()
-    if len(t) < 1 or t in STOPWORDS:
+    if len(t) < 1 or t in _STOPWORDS_CACHE:
         return False
     if re.match(r"^[\d\.,%\-/]+$", t):
         return False
