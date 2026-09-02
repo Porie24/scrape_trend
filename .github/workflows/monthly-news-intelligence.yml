@@ -1,0 +1,45 @@
+name: Monthly News Intelligence Update
+
+on:
+  schedule:
+    # 03:17 UTC on the 1st of every month (off-peak minute, see ScheduleWakeup guidance)
+    - cron: "17 3 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: news-intelligence
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright WebKit
+        run: python3 -m playwright install --with-deps webkit
+
+      - name: Fetch new headlines, extract phrases, render pages
+        run: python3 scripts/news_intelligence/update.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "news-intelligence-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/news_headlines/ news-intelligence/
+          if git diff --cached --quiet; then
+            echo "No changes — nothing new this month."
+          else
+            git commit -m "Monthly news-intelligence update (automated)"
+            git push
+          fi

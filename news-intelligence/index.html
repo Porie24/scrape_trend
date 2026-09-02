@@ -1,0 +1,85 @@
+<meta charset="utf-8">
+<title>คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน — จัดอันดับ</title>
+<style>
+  :root { 
+    --bg: #F6F3EC; --surface: #FFFFFF; --ink: #1E2530; --ink-muted: #646F7C;
+    --ink-faint: #9AA3AD; --rule: #DBD5C7;
+    --c1: #B0512E; --c2: #2B6CB0; --c3: #6B8F3F; --c4: #8A6D3B; --c5: #7A4F8C; --c6: #9AA3AD;
+    --font-th: "Noto Sans Thai", "Sukhumvit Set", "Thonburi", "Leelawadee UI", sans-serif;
+    --font-serif-th: "Noto Serif Thai", "Sukhumvit Set", Georgia, serif;
+
+    --track: #EDE9DD; --c-core: var(--c1); --c-happened: var(--c5); --c-warning: var(--c4); --c-policy: var(--c2); --c-direction: var(--c3); --c-other: var(--c6);
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { 
+      --bg: #171512; --surface: #201D19; --ink: #EDE8DF; --ink-muted: #A99E8D;
+      --ink-faint: #776C5C; --rule: #3A342B;
+      --c1: #E08556; --c2: #6CA6E0; --c3: #9FCB6F; --c4: #D2B26A; --c5: #C39BD9; --c6: #776C5C;
+ --track: #2A2520; } }
+  :root[data-theme="dark"] { 
+      --bg: #171512; --surface: #201D19; --ink: #EDE8DF; --ink-muted: #A99E8D;
+      --ink-faint: #776C5C; --rule: #3A342B;
+      --c1: #E08556; --c2: #6CA6E0; --c3: #9FCB6F; --c4: #D2B26A; --c5: #C39BD9; --c6: #776C5C;
+ --track: #2A2520; }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); }
+  body { color: var(--ink); font-family: var(--font-th); margin: 0; padding: 48px 20px 90px; -webkit-font-smoothing: antialiased; line-height: 1.7; }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-core); font-weight: 700; margin: 0 0 12px; }
+  h1 { font-family: var(--font-serif-th); font-size: clamp(24px, 4vw, 32px); line-height: 1.3; margin: 0 0 12px; text-wrap: balance; font-weight: 600; }
+  .dek { font-size: 15px; line-height: 1.7; color: var(--ink-muted); margin: 0 0 8px; max-width: 68ch; }
+  .source-note { font-size: 12.5px; color: var(--ink-faint); margin: 0 0 32px; }
+  .group { margin-bottom: 30px; }
+  .group-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .group-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .group-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink); }
+  .group-count { font-size: 12px; color: var(--ink-faint); }
+  .row { display: grid; grid-template-columns: 190px 1fr 34px; align-items: center; gap: 12px; padding: 5px 0; }
+  .row-word { font-size: 14.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-track { height: 10px; background: var(--track); border-radius: 5px; overflow: hidden; }
+  .row-bar { height: 100%; border-radius: 5px; }
+  .row-count { font-size: 12.5px; color: var(--ink-muted); text-align: right; font-variant-numeric: tabular-nums; }
+  .callout { background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--c-core); border-radius: 8px; padding: 16px 18px; margin: 8px 0 0; font-size: 13px; line-height: 1.75; color: var(--ink-muted); }
+  .callout strong { color: var(--ink); }
+  a.forward { display: inline-block; margin: 18px 0 0; font-size: 13px; color: var(--ink-faint); text-decoration: none; border-bottom: 1px dotted var(--ink-faint); }
+  footer { margin-top: 22px; font-size: 12px; color: var(--ink-faint); line-height: 1.7; }
+</style>
+<div class="wrap">
+  <p class="eyebrow">Isan Household Financial Fragility Toolkit — อัปเดตอัตโนมัติรายเดือน</p>
+  <h1>คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน — จัดอันดับตามความถี่</h1>
+  <p class="dek">วลี 1-3 คำที่เกี่ยวข้องกับหนี้/ความเปราะบางทางการเงิน จากพาดหัวข่าว 359 รายการ จัดกลุ่มตามความหมาย เรียงจากความถี่มากไปน้อยในแต่ละกลุ่ม</p>
+  <p class="source-note">อัปเดตอัตโนมัติทุกเดือนผ่าน GitHub Actions</p>
+
+  <div id="groups"></div>
+  <a class="forward" href="./wordcloud.html">ดูเป็น word cloud + pie chart →</a>
+
+  <div class="callout">
+    <strong>อ่านยังไง:</strong> เทียบสัดส่วนกลุ่ม "สัญญาณเตือน" กับ "เกิดแล้ว" เพื่อดูว่าสื่อรายงานเชิงเตือนล่วงหน้าหรือรายงานผลที่เกิดแล้วมากกว่ากัน
+  </div>
+  <footer>สร้างโดยอัตโนมัติ · เป็นภาพประกอบเชิงคุณภาพ ไม่ใช่ผลการวิเคราะห์เชิงสถิติ</footer>
+</div>
+<script>
+  var GROUPS = [{"cat": "core", "label": "คำแกนหลัก", "words": [{"text": "หนี้", "count": 187}, {"text": "ครัวเรือน", "count": 118}]}, {"cat": "happened", "label": "เกิดแล้ว (already-happened distress)", "words": [{"text": "หนี้เสีย", "count": 16}, {"text": "NPL", "count": 9}, {"text": "SME", "count": 4}, {"text": "ทรุด", "count": 3}]}, {"cat": "warning", "label": "สัญญาณเตือน (early-warning language)", "words": [{"text": "วิกฤต", "count": 18}, {"text": "ห่วง", "count": 17}, {"text": "จับตา", "count": 13}, {"text": "ปัญหา", "count": 12}, {"text": "เปราะบาง", "count": 8}, {"text": "ปัญหาหนี้", "count": 7}, {"text": "น่าห่วง", "count": 7}, {"text": "วิกฤตหนี้", "count": 7}, {"text": "วิกฤตหนี้ครัวเรือน", "count": 6}, {"text": "ปัญหาหนี้ครัวเรือน", "count": 5}, {"text": "ความเสี่ยง", "count": 4}, {"text": "น่าห่วงแม้", "count": 3}, {"text": "ห่วงแม้ลดเหลือ", "count": 3}, {"text": "ห่วงหนี้ครัวเรือน", "count": 3}, {"text": "แก้กับดักหนี้", "count": 3}, {"text": "กับดักหนี้ครัวเรือน", "count": 3}, {"text": "ฝ่าวิกฤต", "count": 3}, {"text": "ครัวเรือนวิกฤต", "count": 3}]}, {"cat": "policy", "label": "ทางแก้ / มาตรการ (policy response)", "words": [{"text": "แก้หนี้", "count": 20}, {"text": "แก้หนี้ครัวเรือน", "count": 8}, {"text": "ปรับโครงสร้าง", "count": 6}, {"text": "ปรับโครงสร้างหนี้", "count": 5}, {"text": "ลดหนี้", "count": 4}, {"text": "มหกรรมไกล่เกลี่ยหนี้", "count": 3}, {"text": "มาตรการแก้หนี้", "count": 3}, {"text": "เยียวยา", "count": 3}]}, {"cat": "direction", "label": "ทิศทาง / ขนาด (trend & magnitude)", "words": [{"text": "ท่วม", "count": 8}, {"text": "หนี้ครัวเรือนพุ่ง", "count": 7}, {"text": "หนี้ท่วม", "count": 5}, {"text": "ครัวเรือนสูง", "count": 4}, {"text": "หนี้พุ่ง", "count": 4}, {"text": "หนี้สูง", "count": 3}, {"text": "หนี้ครัวเรือนสูง", "count": 3}, {"text": "น้ำท่วม", "count": 3}, {"text": "ก้อนเล็กท่วม", "count": 3}]}, {"cat": "other", "label": "อื่นๆ", "words": [{"text": "หนี้ครัวเรือน", "count": 107}, {"text": "ลด", "count": 38}, {"text": "ดอกเบี้ย", "count": 20}, {"text": "ครัวเรือนไทย", "count": 15}, {"text": "สินเชื่อ", "count": 15}, {"text": "หนี้ครัวเรือนไทย", "count": 14}, {"text": "นอกระบบ", "count": 10}, {"text": "เครดิตบูโร", "count": 10}, {"text": "ลดดอกเบี้ย", "count": 9}, {"text": "ชี้หนี้ครัวเรือน", "count": 8}, {"text": "หนี้นอกระบบ", "count": 6}, {"text": "กู้", "count": 6}, {"text": "ลูกหนี้", "count": 6}, {"text": "หนี้เฉลี่ย", "count": 4}, {"text": "สัดส่วนหนี้", "count": 4}, {"text": "หนี้ครัวเรือนปี", "count": 4}, {"text": "จ่ายหนี้", "count": 4}, {"text": "ลดลง", "count": 4}, {"text": "หนี้ครัวเรือนQ", "count": 3}, {"text": "หนี้ครัวเรือนแตะ", "count": 3}, {"text": "สัดส่วนหนี้ครัวเรือน", "count": 3}, {"text": "เตือนหนี้ครัวเรือน", "count": 3}, {"text": "ดอกเบี้ยขึ้น", "count": 3}, {"text": "หนี้สิน", "count": 3}, {"text": "สินเชื่อแบงก์", "count": 3}, {"text": "หนี้ครัวเรือนลด", "count": 3}, {"text": "หนี้ก้อนเล็ก", "count": 3}, {"text": "หนี้เกษตร", "count": 3}, {"text": "ลดฮวบ", "count": 3}]}];
+  var CAT_COLOR_VAR = { core: '--c-core', happened: '--c-happened', warning: '--c-warning', policy: '--c-policy', direction: '--c-direction', other: '--c-other' };
+  var root = document.getElementById('groups');
+  GROUPS.forEach(function (g) {
+    var maxCount = Math.max.apply(null, g.words.map(function (w) { return w.count; }));
+    var colorVar = CAT_COLOR_VAR[g.cat] || '--c-other';
+    var color = getComputedStyle(document.documentElement).getPropertyValue(colorVar).trim();
+    var section = document.createElement('div'); section.className = 'group';
+    var head = document.createElement('div'); head.className = 'group-head';
+    var dot = document.createElement('span'); dot.className = 'group-dot'; dot.style.background = color; head.appendChild(dot);
+    var title = document.createElement('span'); title.className = 'group-title'; title.textContent = g.label; head.appendChild(title);
+    var cnt = document.createElement('span'); cnt.className = 'group-count'; cnt.textContent = '(' + g.words.length + ' คำ)'; head.appendChild(cnt);
+    section.appendChild(head);
+    g.words.forEach(function (w) {
+      var row = document.createElement('div'); row.className = 'row';
+      var wordEl = document.createElement('div'); wordEl.className = 'row-word'; wordEl.textContent = w.text; row.appendChild(wordEl);
+      var track = document.createElement('div'); track.className = 'row-track';
+      var bar = document.createElement('div'); bar.className = 'row-bar'; bar.style.width = Math.max(4, (w.count / maxCount) * 100) + '%'; bar.style.background = color; track.appendChild(bar);
+      row.appendChild(track);
+      var countEl = document.createElement('div'); countEl.className = 'row-count'; countEl.textContent = w.count; row.appendChild(countEl);
+      section.appendChild(row);
+    });
+    root.appendChild(section);
+  });
+</script>

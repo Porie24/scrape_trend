@@ -1,0 +1,168 @@
+<meta charset="utf-8">
+<title>Word Cloud — คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน</title>
+<style>
+  :root { 
+    --bg: #F6F3EC; --surface: #FFFFFF; --ink: #1E2530; --ink-muted: #646F7C;
+    --ink-faint: #9AA3AD; --rule: #DBD5C7;
+    --c1: #B0512E; --c2: #2B6CB0; --c3: #6B8F3F; --c4: #8A6D3B; --c5: #7A4F8C; --c6: #9AA3AD;
+    --font-th: "Noto Sans Thai", "Sukhumvit Set", "Thonburi", "Leelawadee UI", sans-serif;
+    --font-serif-th: "Noto Serif Thai", "Sukhumvit Set", Georgia, serif;
+ }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { 
+      --bg: #171512; --surface: #201D19; --ink: #EDE8DF; --ink-muted: #A99E8D;
+      --ink-faint: #776C5C; --rule: #3A342B;
+      --c1: #E08556; --c2: #6CA6E0; --c3: #9FCB6F; --c4: #D2B26A; --c5: #C39BD9; --c6: #776C5C;
+ } }
+  :root[data-theme="dark"] { 
+      --bg: #171512; --surface: #201D19; --ink: #EDE8DF; --ink-muted: #A99E8D;
+      --ink-faint: #776C5C; --rule: #3A342B;
+      --c1: #E08556; --c2: #6CA6E0; --c3: #9FCB6F; --c4: #D2B26A; --c5: #C39BD9; --c6: #776C5C;
+ }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); }
+  body { color: var(--ink); font-family: var(--font-th); margin: 0; padding: 48px 20px 90px; -webkit-font-smoothing: antialiased; line-height: 1.7; }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c1); font-weight: 700; margin: 0 0 12px; }
+  h1 { font-family: var(--font-serif-th); font-size: clamp(24px, 4vw, 32px); line-height: 1.3; margin: 0 0 12px; text-wrap: balance; font-weight: 600; }
+  .dek { font-size: 15px; line-height: 1.7; color: var(--ink-muted); margin: 0 0 8px; max-width: 72ch; }
+  .source-note { font-size: 12.5px; color: var(--ink-faint); margin: 0 0 22px; }
+  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; }
+  #cloud { display: block; width: 100%; height: auto; }
+  .legend { display: flex; gap: 18px; margin-top: 16px; font-size: 12px; color: var(--ink-muted); flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 7px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .callout { background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--c1); border-radius: 8px; padding: 16px 18px; margin: 20px 0 0; font-size: 13px; line-height: 1.75; color: var(--ink-muted); }
+  .callout strong { color: var(--ink); }
+  .section-divider { font-family: var(--font-serif-th); font-size: 15px; font-weight: 700; margin: 36px 0 6px; }
+  .pie-wrap { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+  #pie { flex: none; }
+  .pie-legend { display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--ink-muted); flex: 1; min-width: 220px; }
+  .pie-legend-item { display: flex; align-items: baseline; gap: 8px; }
+  .pie-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .pie-legend-label { color: var(--ink); font-weight: 700; }
+  .pie-legend-pct { font-variant-numeric: tabular-nums; color: var(--ink-faint); margin-left: auto; }
+  .pie-slice-c5 { fill: var(--c5); } .pie-dot-c5 { background: var(--c5); }
+  .pie-slice-c4 { fill: var(--c4); } .pie-dot-c4 { background: var(--c4); }
+  .pie-slice-c2 { fill: var(--c2); } .pie-dot-c2 { background: var(--c2); }
+  .pie-slice-c3 { fill: var(--c3); } .pie-dot-c3 { background: var(--c3); }
+  .pie-slice-c6 { fill: var(--c6); } .pie-dot-c6 { background: var(--c6); }
+  .pie-slice-c5, .pie-slice-c4, .pie-slice-c2, .pie-slice-c3, .pie-slice-c6 { stroke: var(--surface); stroke-width: 2; }
+  footer { margin-top: 22px; font-size: 12px; color: var(--ink-faint); line-height: 1.7; }
+  a.back { display: inline-block; margin-bottom: 20px; font-size: 13px; color: var(--ink-faint); text-decoration: none; border-bottom: 1px dotted var(--ink-faint); }
+</style>
+<div class="wrap">
+  <a class="back" href="./index.html">← กลับหน้ารายการจัดอันดับ</a>
+  <p class="eyebrow">Isan Household Financial Fragility Toolkit — อัปเดตอัตโนมัติรายเดือน</p>
+  <h1>คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน</h1>
+  <p class="dek">วลี 1-3 คำที่เกี่ยวข้องกับหนี้/ความเปราะบางทางการเงิน จากพาดหัวข่าว 359 รายการ (The Standard + แหล่งอื่นที่เก็บไว้ในโปรเจกต์) — ตัดคำด้วย pythainlp แล้วรวมคำติดกัน 1-3 คำเป็นวลี ขนาดคำ = ความถี่ (log scale)</p>
+  <p class="source-note">อัปเดตอัตโนมัติทุกเดือนผ่าน GitHub Actions — ดึงพาดหัวใหม่จาก The Standard, สะสมเข้าฐานข้อมูลเดิม</p>
+
+  <div class="card"><canvas id="cloud" width="880" height="520"></canvas></div>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c1)"></span>คำแกนหลัก (หนี้, ครัวเรือน)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c5)"></span>เกิดแล้ว (หนี้เสีย, NPL, ยึดทรัพย์, ล้มละลาย)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c4)"></span>สัญญาณเตือน (ห่วง, จับตา, เสี่ยง, เปราะบาง)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c2)"></span>ทางแก้/มาตรการ (แก้, พักหนี้, ไกล่เกลี่ย)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c3)"></span>ทิศทาง/ขนาด (พุ่ง, สูง, เพิ่ม, ทะลุ)</div>
+  </div>
+
+  <p class="section-divider">สัดส่วนคำ 4 กลุ่มความหมาย (ไม่รวม "หนี้"/"ครัวเรือน")</p>
+  <div class="card">
+    <div class="pie-wrap">
+      <svg id="pie" width="260" height="260" viewBox="0 0 260 260"></svg>
+      <div class="pie-legend" id="pie-legend"></div>
+    </div>
+  </div>
+
+  <footer>สร้างโดยอัตโนมัติ · ตัดคำภาษาไทยด้วย pythainlp · เป็นภาพประกอบเชิงคุณภาพ ไม่ใช่ผลการวิเคราะห์เชิงสถิติ</footer>
+</div>
+<script>
+(function () {
+  var WORDS = [{"text": "หนี้", "count": 187}, {"text": "ครัวเรือน", "count": 118}, {"text": "หนี้ครัวเรือน", "count": 107}, {"text": "ลด", "count": 38}, {"text": "ดอกเบี้ย", "count": 20}, {"text": "แก้หนี้", "count": 20}, {"text": "วิกฤต", "count": 18}, {"text": "ห่วง", "count": 17}, {"text": "หนี้เสีย", "count": 16}, {"text": "ครัวเรือนไทย", "count": 15}, {"text": "สินเชื่อ", "count": 15}, {"text": "หนี้ครัวเรือนไทย", "count": 14}, {"text": "จับตา", "count": 13}, {"text": "ปัญหา", "count": 12}, {"text": "นอกระบบ", "count": 10}, {"text": "เครดิตบูโร", "count": 10}, {"text": "ลดดอกเบี้ย", "count": 9}, {"text": "NPL", "count": 9}, {"text": "ชี้หนี้ครัวเรือน", "count": 8}, {"text": "แก้หนี้ครัวเรือน", "count": 8}, {"text": "ท่วม", "count": 8}, {"text": "เปราะบาง", "count": 8}, {"text": "หนี้ครัวเรือนพุ่ง", "count": 7}, {"text": "ปัญหาหนี้", "count": 7}, {"text": "น่าห่วง", "count": 7}, {"text": "วิกฤตหนี้", "count": 7}, {"text": "หนี้นอกระบบ", "count": 6}, {"text": "กู้", "count": 6}, {"text": "ลูกหนี้", "count": 6}, {"text": "วิกฤตหนี้ครัวเรือน", "count": 6}, {"text": "ปรับโครงสร้าง", "count": 6}, {"text": "ปัญหาหนี้ครัวเรือน", "count": 5}, {"text": "หนี้ท่วม", "count": 5}, {"text": "ปรับโครงสร้างหนี้", "count": 5}, {"text": "SME", "count": 4}, {"text": "หนี้เฉลี่ย", "count": 4}, {"text": "ครัวเรือนสูง", "count": 4}, {"text": "สัดส่วนหนี้", "count": 4}, {"text": "หนี้ครัวเรือนปี", "count": 4}, {"text": "ลดหนี้", "count": 4}, {"text": "ความเสี่ยง", "count": 4}, {"text": "จ่ายหนี้", "count": 4}, {"text": "หนี้พุ่ง", "count": 4}, {"text": "ลดลง", "count": 4}, {"text": "หนี้สูง", "count": 3}, {"text": "หนี้ครัวเรือนQ", "count": 3}, {"text": "หนี้ครัวเรือนสูง", "count": 3}, {"text": "หนี้ครัวเรือนแตะ", "count": 3}, {"text": "สัดส่วนหนี้ครัวเรือน", "count": 3}, {"text": "น่าห่วงแม้", "count": 3}, {"text": "ห่วงแม้ลดเหลือ", "count": 3}, {"text": "มหกรรมไกล่เกลี่ยหนี้", "count": 3}, {"text": "เตือนหนี้ครัวเรือน", "count": 3}, {"text": "ห่วงหนี้ครัวเรือน", "count": 3}, {"text": "แก้กับดักหนี้", "count": 3}, {"text": "กับดักหนี้ครัวเรือน", "count": 3}, {"text": "ดอกเบี้ยขึ้น", "count": 3}, {"text": "หนี้สิน", "count": 3}, {"text": "มาตรการแก้หนี้", "count": 3}, {"text": "ทรุด", "count": 3}, {"text": "ฝ่าวิกฤต", "count": 3}, {"text": "น้ำท่วม", "count": 3}, {"text": "สินเชื่อแบงก์", "count": 3}, {"text": "ครัวเรือนวิกฤต", "count": 3}, {"text": "หนี้ครัวเรือนลด", "count": 3}, {"text": "หนี้ก้อนเล็ก", "count": 3}, {"text": "ก้อนเล็กท่วม", "count": 3}, {"text": "เยียวยา", "count": 3}, {"text": "หนี้เกษตร", "count": 3}, {"text": "ลดฮวบ", "count": 3}];
+  var PIE = [{"cat": "other", "label": "อื่นๆ", "value": 317}, {"cat": "warning", "label": "สัญญาณเตือน (ห่วง, จับตา, เปราะบาง...)", "value": 125}, {"cat": "policy", "label": "ทางแก้/มาตรการ (แก้, พักหนี้...)", "value": 52}, {"cat": "direction", "label": "ทิศทาง/ขนาด (พุ่ง, สูง, เพิ่ม...)", "value": 40}, {"cat": "happened", "label": "เกิดแล้ว (หนี้เสีย, NPL, ยึดทรัพย์...)", "value": 32}];
+  function getColor(varName) { return getComputedStyle(document.documentElement).getPropertyValue(varName).trim(); }
+
+  var CAT_KEYWORDS = [
+    ['c5', ['หนี้เสีย', 'NPL', 'SM', 'ยึดทรัพย์', 'ยึดรถ', 'ยึดบ้าน', 'ล้มละลาย', 'ค้างชำระ', 'ผ่อนไม่ไหว', 'เอาไม่อยู่', 'ระเบิด', 'ทรุด', 'ตกชั้น', 'ตกงาน', 'ว่างงาน', 'เข้าขั้น']],
+    ['c4', ['ห่วง', 'จับตา', 'เสี่ยง', 'เปราะบาง', 'กังวล', 'หวั่น', 'วิกฤต', 'ปัญหา', 'ฉุกเฉิน', 'กับดัก', 'ผันผวน']],
+    ['c2', ['แก้', 'พักหนี้', 'ลดหนี้', 'ปรับโครงสร้าง', 'เจรจา', 'ไกล่เกลี่ย', 'มหกรรม', 'อุ้ม', 'เยียวยา', 'รัดเข็มขัด']],
+    ['c3', ['พุ่ง', 'สูง', 'เพิ่ม', 'ทะลุ', 'ท่วม', 'บาน', 'ติดลบ', 'ร่วง', 'ฉุด', 'หดตัว', 'ชะลอ', 'แย่ลง', 'ต่ำ']],
+  ];
+  function classify(text) {
+    for (var i = 0; i < CAT_KEYWORDS.length; i++) {
+      var cat = CAT_KEYWORDS[i][0], keywords = CAT_KEYWORDS[i][1];
+      for (var j = 0; j < keywords.length; j++) if (text.indexOf(keywords[j]) !== -1) return cat;
+    }
+    if (text === 'หนี้' || text === 'ครัวเรือน') return 'c1';
+    return 'c6';
+  }
+  function colorFor(word) { return getColor('--' + classify(word)); }
+
+  var canvas = document.getElementById('cloud');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  var counts = WORDS.map(function(w) { return w.count; });
+  var maxC = Math.max.apply(null, counts), minC = Math.min.apply(null, counts);
+  function fontSizeFor(c) { var t = (Math.log(c) - Math.log(minC)) / (Math.log(maxC) - Math.log(minC)); return 13 + t * 46; }
+
+  var placed = [];
+  function overlaps(box) {
+    for (var i = 0; i < placed.length; i++) {
+      var p = placed[i];
+      if (box.x < p.x + p.w && box.x + box.w > p.x && box.y < p.y + p.h && box.y + box.h > p.y) return true;
+    }
+    return false;
+  }
+  var fontFamily = 'sans-serif';
+  try { var bf = getComputedStyle(document.body).fontFamily; if (bf) fontFamily = bf; } catch (e) {}
+  var cx = W / 2, cy = H / 2;
+
+  WORDS.forEach(function(w) {
+    var size = fontSizeFor(w.count);
+    ctx.font = '700 ' + size + 'px ' + fontFamily;
+    var metrics = ctx.measureText(w.text);
+    var tw = metrics.width;
+    if (!isFinite(tw) || tw <= 0) tw = w.text.length * size * 0.62;
+    var th = size * 1.05;
+    var angle = 0, radius = 0, found = false;
+    var box = { x: cx - tw / 2, y: cy - th / 2, w: tw, h: th };
+    for (var attempt = 0; attempt < 2000; attempt++) {
+      var x = cx + radius * Math.cos(angle) - tw / 2;
+      var y = cy + radius * Math.sin(angle) * 0.62 - th / 2;
+      var candidate = { x: x, y: y, w: tw, h: th };
+      var inBounds = x > 4 && y > 4 && x + tw < W - 4 && y + th < H - 4;
+      if (inBounds && !overlaps(candidate)) { box = candidate; found = true; break; }
+      if (inBounds) box = candidate;
+      angle += 0.35; radius += 1.6;
+    }
+    placed.push(box);
+    ctx.fillStyle = colorFor(w.text);
+    ctx.textBaseline = 'top';
+    ctx.fillText(w.text, box.x, box.y);
+  });
+
+  var total = PIE.reduce(function (s, d) { return s + d.value; }, 0);
+  var svgNS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs) { var e = document.createElementNS(svgNS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  var pieEl = document.getElementById('pie');
+  var pcx = 130, pcy = 130, pr = 110, pangle = -Math.PI / 2;
+  PIE.forEach(function (d) {
+    var frac = d.value / total, a0 = pangle, a1 = pangle + frac * Math.PI * 2;
+    var x0 = pcx + pr * Math.cos(a0), y0 = pcy + pr * Math.sin(a0);
+    var x1 = pcx + pr * Math.cos(a1), y1 = pcy + pr * Math.sin(a1);
+    var largeArc = (a1 - a0) > Math.PI ? 1 : 0;
+    var path = 'M' + pcx + ',' + pcy + ' L' + x0.toFixed(2) + ',' + y0.toFixed(2) + ' A' + pr + ',' + pr + ' 0 ' + largeArc + ' 1 ' + x1.toFixed(2) + ',' + y1.toFixed(2) + ' Z';
+    pieEl.appendChild(el('path', { d: path, class: 'pie-slice-' + d.cat }));
+    pangle = a1;
+  });
+  var legend = document.getElementById('pie-legend');
+  PIE.forEach(function (d) {
+    var pct = Math.round((d.value / total) * 100);
+    var row = document.createElement('div'); row.className = 'pie-legend-item';
+    var dot = document.createElement('span'); dot.className = 'pie-legend-dot pie-dot-' + d.cat; row.appendChild(dot);
+    var label = document.createElement('span'); label.className = 'pie-legend-label'; label.textContent = d.label; row.appendChild(label);
+    var pctEl = document.createElement('span'); pctEl.className = 'pie-legend-pct'; pctEl.textContent = pct + '% (' + d.value + ')'; row.appendChild(pctEl);
+    legend.appendChild(row);
+  });
+})();
+</script>
