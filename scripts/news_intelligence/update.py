@@ -219,6 +219,28 @@ def is_content_token(t):
     return bool(t.strip())
 
 
+# Words that function as prepositions/classifiers expecting a number right
+# after them ("หนี้ครัวเรือนแตะ 93%", "หนี้ก้อนเล็ก", "ลดเหลือ 89.3%", "อันดับ 10")
+# — when the number gets filtered out as a non-content token, the run ends
+# right after one of these, producing grammatically-dangling fragments like
+# "หนี้ครัวเรือนแตะ" or "ลดเหลือ" with nothing after. Traced from real
+# reported cases — see conversation history. Phrases are not allowed to end
+# on these. Checked with endswith() rather than exact match because newmm
+# sometimes tokenizes these as a suffix fused onto the previous word
+# ("ลดเหลือ" comes out as one token, not "ลด" + "เหลือ").
+DANGLING_ENDING_SUFFIXES = ("แตะ", "เหลือ", "ก้อน", "ถึง", "กว่า", "ราว", "ประมาณ",
+                            "จำนวน", "ปี", "ปีที่", "อันดับ")
+
+# Specific phrases that read backwards/nonsensically because the n-gram window
+# crossed a real syntactic boundary that isn't marked by any stopword or
+# filtered token — e.g. "แรงงานไทยหนี้เฉลี่ย" tokenizes to [แรงงาน, ไทย, หนี้,
+# เฉลี่ย]; "ไทย" modifies "แรงงาน" (Thai workers), not "หนี้" — but a bare
+# 2-gram sees "ไทย"+"หนี้" adjacent and produces "ไทยหนี้", which isn't a
+# real Thai phrase. A handful of confirmed cases, blocked by exact text
+# rather than solved generically (would need real dependency parsing).
+BAD_PHRASES = {"ไทยหนี้"}
+
+
 def extract_phrases(headlines):
     from pythainlp.tokenize import word_tokenize
 
@@ -241,8 +263,10 @@ def extract_phrases(headlines):
             n = len(run)
             for size in (3, 2, 1):
                 for i in range(n - size + 1):
+                    if run[i + size - 1].endswith(DANGLING_ENDING_SUFFIXES):
+                        continue
                     gram = "".join(run[i:i + size])
-                    if len(gram) < 2:
+                    if len(gram) < 2 or gram in BAD_PHRASES:
                         continue
                     if not any(a in gram for a in ANCHORS):
                         continue
