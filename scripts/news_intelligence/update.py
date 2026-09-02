@@ -114,6 +114,7 @@ def update_incremental():
 STOPWORDS = set("""
 ที่ และ ใน กับ ของ ให้ จาก เป็น มี ได้ ไป มา แล้ว ไม่ จะ ก็ ต่อ ยัง อยู่ ว่า นี้ นั้น
 เพื่อ ถึง โดย หรือ แต่ ซึ่ง ตาม กว่า อีก ทั้ง เมื่อ คือ อย่าง ต้อง สำหรับ
+แม้ หาก ถ้า เพราะ จึง ทำให้ ขณะ ทั้งนี้ เหตุ ดัง ส่วน อีกทั้ง หลัง ก่อน
 """.split())
 
 # Categories are anchored to two research sources already cited in this
@@ -174,6 +175,10 @@ def is_content_token(t):
     if len(t) < 1 or t in STOPWORDS:
         return False
     if re.match(r"^[\d\.,%\-/]+$", t):
+        return False
+    # drop stray single Latin letters — leftover fragments from things like
+    # "Q1/2026" where the tokenizer splits off "Q" and the digits get filtered
+    if len(t) == 1 and re.match(r"^[A-Za-z]$", t):
         return False
     return bool(t.strip())
 
