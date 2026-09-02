@@ -128,7 +128,7 @@ def _load_stopwords():
     from pythainlp.corpus import thai_stopwords
     return set(thai_stopwords()) - STOPWORD_EXCEPTIONS
 
-# Categories are anchored to two research sources already cited in this
+# Categories are anchored to three research sources already cited in this
 # project (summary_memo.html section 1.1 + this conversation):
 #   - Lusardi, Schneider & Tufano (2011): fragility = liquidity-buffer shortfall
 #   - Levy Institute fragility index: debt-to-income, DSR, short-term-debt
@@ -138,7 +138,18 @@ def _load_stopwords():
 #     debt tolerance's determinants are debt burden, financial cushion,
 #     income security, financial history, and financial discipline.
 #   - NPL/Stage2 (this project's real data) = proxy for "DSR-failure"
-# This taxonomy makes that mapping explicit in the news-phrase categorization.
+#
+# The category *concepts* above come from those papers, but the papers
+# themselves measure debt tolerance via survey/statistical data, not Thai
+# text — they don't supply a Thai keyword dictionary. The keyword lists below
+# were originally my own guesses at which Thai words correspond to each
+# concept (not validated against anything). They were then cross-checked
+# against projects.pier.or.th/household-debt/ — a joint Bank of
+# Thailand x PIER Thai-language explainer on this exact topic — which
+# supplied real Thai terminology ("การเก็บออม", "รีไฟแนนซ์", "รวมหนี้",
+# "ภาระหนี้ต่อรายได้") that was missing before. Still not a validated
+# classifier — just grounded in an authoritative Thai source instead of
+# guesswork alone.
 ANCHORS = set("""
 หนี้ ครัวเรือน เปราะบาง วิกฤต เสี่ยง ห่วง จับตา ปัญหา ดอกเบี้ย สินเชื่อ
 เครดิตบูโร ลูกหนี้ NPL SM ยึด ล้มละลาย ค้างชำระ ผ่อน ทวง กับดัก
@@ -146,7 +157,8 @@ ANCHORS = set("""
 ลด ปรับโครงสร้าง เยียวยา อุ้ม รัดเข็มขัด กู้ นอกระบบ ฉุกเฉิน
 สภาพคล่อง เงินสำรอง เงินสด รายได้ ทรัพย์สิน ภาระ DSR ระยะสั้น
 จ่ายไม่ไหว เงินไม่พอ ไม่มีเงิน GDP จีดีพี ต่อรายได้ สัดส่วนหนี้
-แบล็คลิสต์ ประวัติ อาชีพ มั่นคง วินัย ออม เกษตรกร รับจ้าง
+แบล็คลิสต์ ประวัติ อาชีพ มั่นคง วินัย เก็บออม ออมเงิน เกษตรกร รับจ้าง
+รีไฟแนนซ์ รวมหนี้ ฐานข้อมูล น้อย
 """.split())
 
 CAT_KEYWORDS = [
@@ -156,19 +168,26 @@ CAT_KEYWORDS = [
     # debt burden / Debt-Service Ratio — PIER's #1 determinant of debt tolerance
     ("debt_burden", ["จ่ายไม่ไหว", "เงินไม่พอ", "ขาดสภาพคล่อง", "ภาระหนี้", "ภาระผ่อน", "DSR",
                       "รายได้ไม่พอ"]),
-    # financial cushion / liquidity buffer — Lusardi et al. (2011) + PIER's "financial cushion"
-    ("financial_cushion", ["สภาพคล่อง", "เงินสำรอง", "เงินสด", "ไม่มีเงิน", "ทรัพย์สิน"]),
-    # income security — PIER: farmers/general-workers/business-owners have lower debt tolerance
-    ("income_security", ["ตกงาน", "ว่างงาน", "เกษตรกร", "รับจ้าง", "อาชีพอิสระ", "รายได้ไม่มั่นคง"]),
+    # financial cushion / liquidity buffer — Lusardi et al. (2011) + PIER's "financial cushion";
+    # "เก็บออม"/"ออมเงิน" added after checking the BOT x PIER Thai explainer ("การเก็บออม",
+    # "วางแผนการออมเงิน") — NOT the bare syllable "ออม", which false-positive-matches
+    # "ออมสิน" (Government Savings Bank's name) and has zero true positives in this corpus
+    ("financial_cushion", ["สภาพคล่อง", "เงินสำรอง", "เงินสด", "ไม่มีเงิน", "ทรัพย์สิน",
+                            "เก็บออม", "ออมเงิน"]),
+    # income security — PIER: farmers/general-workers/business-owners have lower debt tolerance;
+    # "รายได้น้อย" added after checking the BOT x PIER explainer ("ผู้มีรายได้น้อย")
+    ("income_security", ["ตกงาน", "ว่างงาน", "เกษตรกร", "รับจ้าง", "อาชีพอิสระ", "รายได้ไม่มั่นคง",
+                          "รายได้น้อย"]),
     # financial history — PIER: past delinquency lowers debt tolerance long-term
-    ("financial_history", ["เครดิตบูโร", "แบล็คลิสต์", "ประวัติ"]),
+    ("financial_history", ["เครดิตบูโร", "แบล็คลิสต์", "ประวัติ", "ฐานข้อมูล"]),
     # debt structure/leverage — debt-to-income, short-term debt proportion (Levy Institute)
     ("debt_structure", ["ต่อรายได้", "ระยะสั้น", "สัดส่วนหนี้", "ต่อ GDP", "ต่อจีดีพี", "หนี้ต่อ"]),
     # general risk sentiment — not a specific framework component, but the dominant news register
     ("warning_general", ["ห่วง", "จับตา", "เสี่ยง", "เปราะบาง", "กังวล", "หวั่น", "วิกฤต", "ปัญหา",
                           "ฉุกเฉิน", "กับดัก", "ผันผวน"]),
+    # policy response — "รีไฟแนนซ์"/"รวมหนี้" added after checking the BOT x PIER explainer
     ("policy", ["แก้", "พักหนี้", "ลดหนี้", "ปรับโครงสร้าง", "เจรจา", "ไกล่เกลี่ย", "มหกรรม",
-                "อุ้ม", "เยียวยา", "รัดเข็มขัด"]),
+                "อุ้ม", "เยียวยา", "รัดเข็มขัด", "รีไฟแนนซ์", "รวมหนี้"]),
 ]
 
 
