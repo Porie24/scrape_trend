@@ -116,22 +116,47 @@ STOPWORDS = set("""
 เพื่อ ถึง โดย หรือ แต่ ซึ่ง ตาม กว่า อีก ทั้ง เมื่อ คือ อย่าง ต้อง สำหรับ
 """.split())
 
+# Categories are anchored to two research sources already cited in this
+# project (summary_memo.html section 1.1 + this conversation):
+#   - Lusardi, Schneider & Tufano (2011): fragility = liquidity-buffer shortfall
+#   - Levy Institute fragility index: debt-to-income, DSR, short-term-debt
+#     proportion, liquid-assets-to-liabilities, net worth
+#   - PIER Discussion Paper 012 "Gauging Households' Debt Tolerance: Evidence
+#     from Thailand" (pier.or.th/files/dp/pier_dp_012.pdf) — Thai-specific:
+#     debt tolerance's determinants are debt burden, financial cushion,
+#     income security, financial history, and financial discipline.
+#   - NPL/Stage2 (this project's real data) = proxy for "DSR-failure"
+# This taxonomy makes that mapping explicit in the news-phrase categorization.
 ANCHORS = set("""
 หนี้ ครัวเรือน เปราะบาง วิกฤต เสี่ยง ห่วง จับตา ปัญหา ดอกเบี้ย สินเชื่อ
 เครดิตบูโร ลูกหนี้ NPL SM ยึด ล้มละลาย ค้างชำระ ผ่อน ทวง กับดัก
 ทรุด ท่วม บาน ตกชั้น ตกงาน ว่างงาน มหกรรม ไกล่เกลี่ย เจรจา พัก
 ลด ปรับโครงสร้าง เยียวยา อุ้ม รัดเข็มขัด กู้ นอกระบบ ฉุกเฉิน
+สภาพคล่อง เงินสำรอง เงินสด รายได้ ทรัพย์สิน ภาระ DSR ระยะสั้น
+จ่ายไม่ไหว เงินไม่พอ ไม่มีเงิน GDP จีดีพี ต่อรายได้ สัดส่วนหนี้
+แบล็คลิสต์ ประวัติ อาชีพ มั่นคง วินัย ออม เกษตรกร รับจ้าง
 """.split())
 
 CAT_KEYWORDS = [
-    ("happened", ["หนี้เสีย", "NPL", "SM", "ยึดทรัพย์", "ยึดรถ", "ยึดบ้าน", "ล้มละลาย", "ค้างชำระ",
-                  "ผ่อนไม่ไหว", "เอาไม่อยู่", "ระเบิด", "ทรุด", "ตกชั้น", "ตกงาน", "ว่างงาน", "เข้าขั้น"]),
-    ("warning", ["ห่วง", "จับตา", "เสี่ยง", "เปราะบาง", "กังวล", "หวั่น", "วิกฤต", "ปัญหา",
-                 "ฉุกเฉิน", "กับดัก", "ผันผวน"]),
+    # realized distress — the project's own NPL/Stage2 data is exactly this ("DSR-failure")
+    ("dsr_failure", ["หนี้เสีย", "NPL", "SM", "ยึดทรัพย์", "ยึดรถ", "ยึดบ้าน", "ล้มละลาย", "ค้างชำระ",
+                      "ผ่อนไม่ไหว", "เอาไม่อยู่", "ทรุด", "ตกชั้น", "เข้าขั้น"]),
+    # debt burden / Debt-Service Ratio — PIER's #1 determinant of debt tolerance
+    ("debt_burden", ["จ่ายไม่ไหว", "เงินไม่พอ", "ขาดสภาพคล่อง", "ภาระหนี้", "ภาระผ่อน", "DSR",
+                      "รายได้ไม่พอ"]),
+    # financial cushion / liquidity buffer — Lusardi et al. (2011) + PIER's "financial cushion"
+    ("financial_cushion", ["สภาพคล่อง", "เงินสำรอง", "เงินสด", "ไม่มีเงิน", "ทรัพย์สิน"]),
+    # income security — PIER: farmers/general-workers/business-owners have lower debt tolerance
+    ("income_security", ["ตกงาน", "ว่างงาน", "เกษตรกร", "รับจ้าง", "อาชีพอิสระ", "รายได้ไม่มั่นคง"]),
+    # financial history — PIER: past delinquency lowers debt tolerance long-term
+    ("financial_history", ["เครดิตบูโร", "แบล็คลิสต์", "ประวัติ"]),
+    # debt structure/leverage — debt-to-income, short-term debt proportion (Levy Institute)
+    ("debt_structure", ["ต่อรายได้", "ระยะสั้น", "สัดส่วนหนี้", "ต่อ GDP", "ต่อจีดีพี", "หนี้ต่อ"]),
+    # general risk sentiment — not a specific framework component, but the dominant news register
+    ("warning_general", ["ห่วง", "จับตา", "เสี่ยง", "เปราะบาง", "กังวล", "หวั่น", "วิกฤต", "ปัญหา",
+                          "ฉุกเฉิน", "กับดัก", "ผันผวน"]),
     ("policy", ["แก้", "พักหนี้", "ลดหนี้", "ปรับโครงสร้าง", "เจรจา", "ไกล่เกลี่ย", "มหกรรม",
                 "อุ้ม", "เยียวยา", "รัดเข็มขัด"]),
-    ("direction", ["พุ่ง", "สูง", "เพิ่ม", "ทะลุ", "ท่วม", "บาน", "ติดลบ", "ร่วง", "ฉุด", "หดตัว",
-                   "ชะลอ", "แย่ลง", "ต่ำ"]),
 ]
 
 
@@ -219,7 +244,7 @@ def render(phrase_data, n_headlines):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from render_pages import render_wordcloud, render_wordlist
 
-    render_wordcloud(phrase_data, n_headlines, OUT_DIR / "wordcloud.html")
+    render_wordcloud(phrase_data, n_headlines, OUT_DIR / "wordcloud.html", classify)
     render_wordlist(phrase_data, n_headlines, OUT_DIR / "index.html", classify)
 
 

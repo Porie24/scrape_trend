@@ -6,30 +6,45 @@ Toolkit artifact family (warm cream / dark theme)."""
 
 import json
 
+# Category set anchored to Lusardi et al. (2011), the Levy Institute fragility
+# index, and PIER DP 012 (Gauging Households' Debt Tolerance: Evidence from
+# Thailand) — see the comment above CAT_KEYWORDS in update.py for the mapping.
 PIE_LABEL = {
-    "happened": "เกิดแล้ว (หนี้เสีย, NPL, ยึดทรัพย์...)",
-    "warning": "สัญญาณเตือน (ห่วง, จับตา, เปราะบาง...)",
+    "dsr_failure": "DSR-failure ที่เกิดแล้ว (หนี้เสีย, NPL, ยึดทรัพย์...)",
+    "debt_burden": "ภาระหนี้ / DSR (ผ่อนไม่ไหว, จ่ายไม่ไหว...)",
+    "financial_cushion": "เงินสำรอง / สภาพคล่อง (Lusardi et al. 2011)",
+    "income_security": "ความมั่นคงรายได้ (ตกงาน, อาชีพเสี่ยง...)",
+    "financial_history": "ประวัติทางการเงิน (เครดิตบูโร, แบล็คลิสต์)",
+    "debt_structure": "โครงสร้างหนี้ (หนี้ต่อรายได้, ระยะสั้น...)",
+    "warning_general": "สัญญาณเตือนทั่วไป (ห่วง, จับตา, เปราะบาง...)",
     "policy": "ทางแก้/มาตรการ (แก้, พักหนี้...)",
-    "direction": "ทิศทาง/ขนาด (พุ่ง, สูง, เพิ่ม...)",
     "other": "อื่นๆ",
 }
 CAT_LABEL_FULL = {
     "core": "คำแกนหลัก",
-    "happened": "เกิดแล้ว (already-happened distress)",
-    "warning": "สัญญาณเตือน (early-warning language)",
+    "dsr_failure": "DSR-failure ที่เกิดแล้ว (realized distress)",
+    "debt_burden": "ภาระหนี้ / DSR (debt-service capacity)",
+    "financial_cushion": "เงินสำรอง / สภาพคล่อง (liquidity buffer)",
+    "income_security": "ความมั่นคงรายได้ (income security)",
+    "financial_history": "ประวัติทางการเงิน (financial history)",
+    "debt_structure": "โครงสร้างหนี้ (debt structure / leverage)",
+    "warning_general": "สัญญาณเตือนทั่วไป (general warning sentiment)",
     "policy": "ทางแก้ / มาตรการ (policy response)",
-    "direction": "ทิศทาง / ขนาด (trend & magnitude)",
     "other": "อื่นๆ",
 }
-CAT_ORDER = ["core", "happened", "warning", "policy", "direction", "other"]
+CAT_ORDER = ["core", "dsr_failure", "debt_burden", "financial_cushion", "income_security",
+             "financial_history", "debt_structure", "warning_general", "policy", "other"]
 CAT_COLOR_VAR = {
-    "core": "c1", "happened": "c5", "warning": "c4", "policy": "c2", "direction": "c3", "other": "c6",
+    "core": "c1", "dsr_failure": "c5", "debt_burden": "c7", "financial_cushion": "c8",
+    "income_security": "c9", "financial_history": "c10", "debt_structure": "c3",
+    "warning_general": "c4", "policy": "c2", "other": "c6",
 }
 
 BASE_CSS_VARS = """
     --bg: #F6F3EC; --surface: #FFFFFF; --ink: #1E2530; --ink-muted: #646F7C;
     --ink-faint: #9AA3AD; --rule: #DBD5C7;
     --c1: #B0512E; --c2: #2B6CB0; --c3: #6B8F3F; --c4: #8A6D3B; --c5: #7A4F8C; --c6: #9AA3AD;
+    --c7: #A24B4B; --c8: #3D8B8B; --c9: #C77B3B; --c10: #4B6FA5;
     --font-th: "Noto Sans Thai", "Sukhumvit Set", "Thonburi", "Leelawadee UI", sans-serif;
     --font-serif-th: "Noto Serif Thai", "Sukhumvit Set", Georgia, serif;
 """
@@ -37,16 +52,17 @@ DARK_CSS_VARS = """
       --bg: #171512; --surface: #201D19; --ink: #EDE8DF; --ink-muted: #A99E8D;
       --ink-faint: #776C5C; --rule: #3A342B;
       --c1: #E08556; --c2: #6CA6E0; --c3: #9FCB6F; --c4: #D2B26A; --c5: #C39BD9; --c6: #776C5C;
+      --c7: #D97B7B; --c8: #6FBFBF; --c9: #E0A56C; --c10: #8FAEDD;
 """
 
 
-def render_wordcloud(phrase_data, n_headlines, out_path):
+def render_wordcloud(phrase_data, n_headlines, out_path, classify_fn):
     words = phrase_data["words"]
     words_json = json.dumps(words, ensure_ascii=False)
 
     pie_sums = {}
     for w in words:
-        cat = _classify_for_pie(w["text"])
+        cat = classify_fn(w["text"])
         if cat == "core":
             continue
         pie_sums[cat] = pie_sums.get(cat, 0) + w["count"]
@@ -83,25 +99,6 @@ def render_wordlist(phrase_data, n_headlines, out_path, classify_fn):
     out_path.write_text(html, encoding="utf-8")
 
 
-def _classify_for_pie(text):
-    CAT_KEYWORDS = [
-        ("happened", ["หนี้เสีย", "NPL", "SM", "ยึดทรัพย์", "ยึดรถ", "ยึดบ้าน", "ล้มละลาย", "ค้างชำระ",
-                      "ผ่อนไม่ไหว", "เอาไม่อยู่", "ระเบิด", "ทรุด", "ตกชั้น", "ตกงาน", "ว่างงาน", "เข้าขั้น"]),
-        ("warning", ["ห่วง", "จับตา", "เสี่ยง", "เปราะบาง", "กังวล", "หวั่น", "วิกฤต", "ปัญหา",
-                     "ฉุกเฉิน", "กับดัก", "ผันผวน"]),
-        ("policy", ["แก้", "พักหนี้", "ลดหนี้", "ปรับโครงสร้าง", "เจรจา", "ไกล่เกลี่ย", "มหกรรม",
-                    "อุ้ม", "เยียวยา", "รัดเข็มขัด"]),
-        ("direction", ["พุ่ง", "สูง", "เพิ่ม", "ทะลุ", "ท่วม", "บาน", "ติดลบ", "ร่วง", "ฉุด", "หดตัว",
-                       "ชะลอ", "แย่ลง", "ต่ำ"]),
-    ]
-    for cat, keywords in CAT_KEYWORDS:
-        if any(kw in text for kw in keywords):
-            return cat
-    if text in ("หนี้", "ครัวเรือน"):
-        return "core"
-    return "other"
-
-
 HTML_WORDCLOUD_TEMPLATE = r'''<meta charset="utf-8">
 <title>Word Cloud — คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน</title>
 <style>
@@ -131,12 +128,18 @@ HTML_WORDCLOUD_TEMPLATE = r'''<meta charset="utf-8">
   .pie-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
   .pie-legend-label { color: var(--ink); font-weight: 700; }
   .pie-legend-pct { font-variant-numeric: tabular-nums; color: var(--ink-faint); margin-left: auto; }
-  .pie-slice-c5 { fill: var(--c5); } .pie-dot-c5 { background: var(--c5); }
-  .pie-slice-c4 { fill: var(--c4); } .pie-dot-c4 { background: var(--c4); }
-  .pie-slice-c2 { fill: var(--c2); } .pie-dot-c2 { background: var(--c2); }
-  .pie-slice-c3 { fill: var(--c3); } .pie-dot-c3 { background: var(--c3); }
-  .pie-slice-c6 { fill: var(--c6); } .pie-dot-c6 { background: var(--c6); }
-  .pie-slice-c5, .pie-slice-c4, .pie-slice-c2, .pie-slice-c3, .pie-slice-c6 { stroke: var(--surface); stroke-width: 2; }
+  .pie-slice-policy { fill: var(--c2); } .pie-dot-policy { background: var(--c2); }
+  .pie-slice-debt_structure { fill: var(--c3); } .pie-dot-debt_structure { background: var(--c3); }
+  .pie-slice-warning_general { fill: var(--c4); } .pie-dot-warning_general { background: var(--c4); }
+  .pie-slice-dsr_failure { fill: var(--c5); } .pie-dot-dsr_failure { background: var(--c5); }
+  .pie-slice-other { fill: var(--c6); } .pie-dot-other { background: var(--c6); }
+  .pie-slice-debt_burden { fill: var(--c7); } .pie-dot-debt_burden { background: var(--c7); }
+  .pie-slice-financial_cushion { fill: var(--c8); } .pie-dot-financial_cushion { background: var(--c8); }
+  .pie-slice-income_security { fill: var(--c9); } .pie-dot-income_security { background: var(--c9); }
+  .pie-slice-financial_history { fill: var(--c10); } .pie-dot-financial_history { background: var(--c10); }
+  .pie-slice-policy, .pie-slice-debt_structure, .pie-slice-warning_general, .pie-slice-dsr_failure,
+  .pie-slice-other, .pie-slice-debt_burden, .pie-slice-financial_cushion, .pie-slice-income_security,
+  .pie-slice-financial_history { stroke: var(--surface); stroke-width: 2; }
   footer { margin-top: 22px; font-size: 12px; color: var(--ink-faint); line-height: 1.7; }
   a.back { display: inline-block; margin-bottom: 20px; font-size: 13px; color: var(--ink-faint); text-decoration: none; border-bottom: 1px dotted var(--ink-faint); }
 </style>
@@ -144,19 +147,23 @@ HTML_WORDCLOUD_TEMPLATE = r'''<meta charset="utf-8">
   <a class="back" href="./index.html">← กลับหน้ารายการจัดอันดับ</a>
   <p class="eyebrow">Isan Household Financial Fragility Toolkit — อัปเดตอัตโนมัติรายเดือน</p>
   <h1>คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน</h1>
-  <p class="dek">วลี 1-3 คำที่เกี่ยวข้องกับหนี้/ความเปราะบางทางการเงิน จากพาดหัวข่าว __N_HEADLINES__ รายการ (The Standard + แหล่งอื่นที่เก็บไว้ในโปรเจกต์) — ตัดคำด้วย pythainlp แล้วรวมคำติดกัน 1-3 คำเป็นวลี ขนาดคำ = ความถี่ (log scale)</p>
+  <p class="dek">วลี 1-3 คำที่เกี่ยวข้องกับหนี้/ความเปราะบางทางการเงิน จากพาดหัวข่าว __N_HEADLINES__ รายการ (The Standard + แหล่งอื่นที่เก็บไว้ในโปรเจกต์) — ตัดคำด้วย pythainlp แล้วรวมคำติดกัน 1-3 คำเป็นวลี ขนาดคำ = ความถี่ (log scale) จัดหมวดตามกรอบวิจัย Lusardi et al. (2011), Levy Institute fragility index, และ PIER DP 012 "Gauging Households' Debt Tolerance: Evidence from Thailand"</p>
   <p class="source-note">อัปเดตอัตโนมัติทุกเดือนผ่าน GitHub Actions — ดึงพาดหัวใหม่จาก The Standard, สะสมเข้าฐานข้อมูลเดิม</p>
 
   <div class="card"><canvas id="cloud" width="880" height="520"></canvas></div>
   <div class="legend">
-    <div class="legend-item"><span class="legend-dot" style="background:var(--c1)"></span>คำแกนหลัก (หนี้, ครัวเรือน)</div>
-    <div class="legend-item"><span class="legend-dot" style="background:var(--c5)"></span>เกิดแล้ว (หนี้เสีย, NPL, ยึดทรัพย์, ล้มละลาย)</div>
-    <div class="legend-item"><span class="legend-dot" style="background:var(--c4)"></span>สัญญาณเตือน (ห่วง, จับตา, เสี่ยง, เปราะบาง)</div>
-    <div class="legend-item"><span class="legend-dot" style="background:var(--c2)"></span>ทางแก้/มาตรการ (แก้, พักหนี้, ไกล่เกลี่ย)</div>
-    <div class="legend-item"><span class="legend-dot" style="background:var(--c3)"></span>ทิศทาง/ขนาด (พุ่ง, สูง, เพิ่ม, ทะลุ)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c1)"></span>คำแกนหลัก</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c5)"></span>DSR-failure ที่เกิดแล้ว</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c7)"></span>ภาระหนี้ / DSR</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c8)"></span>เงินสำรอง / สภาพคล่อง</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c9)"></span>ความมั่นคงรายได้</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c10)"></span>ประวัติทางการเงิน</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c3)"></span>โครงสร้างหนี้</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c4)"></span>สัญญาณเตือนทั่วไป</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c2)"></span>ทางแก้/มาตรการ</div>
   </div>
 
-  <p class="section-divider">สัดส่วนคำ 4 กลุ่มความหมาย (ไม่รวม "หนี้"/"ครัวเรือน")</p>
+  <p class="section-divider">สัดส่วนคำตามกรอบความเปราะบางการเงิน (ไม่รวม "หนี้"/"ครัวเรือน")</p>
   <div class="card">
     <div class="pie-wrap">
       <svg id="pie" width="260" height="260" viewBox="0 0 260 260"></svg>
@@ -173,10 +180,14 @@ HTML_WORDCLOUD_TEMPLATE = r'''<meta charset="utf-8">
   function getColor(varName) { return getComputedStyle(document.documentElement).getPropertyValue(varName).trim(); }
 
   var CAT_KEYWORDS = [
-    ['c5', ['หนี้เสีย', 'NPL', 'SM', 'ยึดทรัพย์', 'ยึดรถ', 'ยึดบ้าน', 'ล้มละลาย', 'ค้างชำระ', 'ผ่อนไม่ไหว', 'เอาไม่อยู่', 'ระเบิด', 'ทรุด', 'ตกชั้น', 'ตกงาน', 'ว่างงาน', 'เข้าขั้น']],
+    ['c5', ['หนี้เสีย', 'NPL', 'SM', 'ยึดทรัพย์', 'ยึดรถ', 'ยึดบ้าน', 'ล้มละลาย', 'ค้างชำระ', 'ผ่อนไม่ไหว', 'เอาไม่อยู่', 'ทรุด', 'ตกชั้น', 'เข้าขั้น']],
+    ['c7', ['จ่ายไม่ไหว', 'เงินไม่พอ', 'ขาดสภาพคล่อง', 'ภาระหนี้', 'ภาระผ่อน', 'DSR', 'รายได้ไม่พอ']],
+    ['c8', ['สภาพคล่อง', 'เงินสำรอง', 'เงินสด', 'ไม่มีเงิน', 'ทรัพย์สิน']],
+    ['c9', ['ตกงาน', 'ว่างงาน', 'เกษตรกร', 'รับจ้าง', 'อาชีพอิสระ', 'รายได้ไม่มั่นคง']],
+    ['c10', ['เครดิตบูโร', 'แบล็คลิสต์', 'ประวัติ']],
+    ['c3', ['ต่อรายได้', 'ระยะสั้น', 'สัดส่วนหนี้', 'ต่อ GDP', 'ต่อจีดีพี', 'หนี้ต่อ']],
     ['c4', ['ห่วง', 'จับตา', 'เสี่ยง', 'เปราะบาง', 'กังวล', 'หวั่น', 'วิกฤต', 'ปัญหา', 'ฉุกเฉิน', 'กับดัก', 'ผันผวน']],
     ['c2', ['แก้', 'พักหนี้', 'ลดหนี้', 'ปรับโครงสร้าง', 'เจรจา', 'ไกล่เกลี่ย', 'มหกรรม', 'อุ้ม', 'เยียวยา', 'รัดเข็มขัด']],
-    ['c3', ['พุ่ง', 'สูง', 'เพิ่ม', 'ทะลุ', 'ท่วม', 'บาน', 'ติดลบ', 'ร่วง', 'ฉุด', 'หดตัว', 'ชะลอ', 'แย่ลง', 'ต่ำ']],
   ];
   function classify(text) {
     for (var i = 0; i < CAT_KEYWORDS.length; i++) {
@@ -262,7 +273,9 @@ HTML_WORDLIST_TEMPLATE = r'''<meta charset="utf-8">
 <title>คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน — จัดอันดับ</title>
 <style>
   :root { __BASE_VARS__
-    --track: #EDE9DD; --c-core: var(--c1); --c-happened: var(--c5); --c-warning: var(--c4); --c-policy: var(--c2); --c-direction: var(--c3); --c-other: var(--c6);
+    --track: #EDE9DD; --c-core: var(--c1); --c-dsr_failure: var(--c5); --c-debt_burden: var(--c7);
+    --c-financial_cushion: var(--c8); --c-income_security: var(--c9); --c-financial_history: var(--c10);
+    --c-debt_structure: var(--c3); --c-warning_general: var(--c4); --c-policy: var(--c2); --c-other: var(--c6);
   }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { __DARK_VARS__ --track: #2A2520; } }
   :root[data-theme="dark"] { __DARK_VARS__ --track: #2A2520; }
@@ -292,20 +305,25 @@ HTML_WORDLIST_TEMPLATE = r'''<meta charset="utf-8">
 <div class="wrap">
   <p class="eyebrow">Isan Household Financial Fragility Toolkit — อัปเดตอัตโนมัติรายเดือน</p>
   <h1>คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน — จัดอันดับตามความถี่</h1>
-  <p class="dek">วลี 1-3 คำที่เกี่ยวข้องกับหนี้/ความเปราะบางทางการเงิน จากพาดหัวข่าว __N_HEADLINES__ รายการ จัดกลุ่มตามความหมาย เรียงจากความถี่มากไปน้อยในแต่ละกลุ่ม</p>
+  <p class="dek">วลี 1-3 คำที่เกี่ยวข้องกับหนี้/ความเปราะบางทางการเงิน จากพาดหัวข่าว __N_HEADLINES__ รายการ จัดกลุ่มตามกรอบวิจัย Lusardi et al. (2011), Levy Institute fragility index, และ PIER DP 012 "Gauging Households' Debt Tolerance: Evidence from Thailand" เรียงจากความถี่มากไปน้อยในแต่ละกลุ่ม</p>
   <p class="source-note">อัปเดตอัตโนมัติทุกเดือนผ่าน GitHub Actions</p>
 
   <div id="groups"></div>
   <a class="forward" href="./wordcloud.html">ดูเป็น word cloud + pie chart →</a>
 
   <div class="callout">
-    <strong>อ่านยังไง:</strong> เทียบสัดส่วนกลุ่ม "สัญญาณเตือน" กับ "เกิดแล้ว" เพื่อดูว่าสื่อรายงานเชิงเตือนล่วงหน้าหรือรายงานผลที่เกิดแล้วมากกว่ากัน
+    <strong>อ่านยังไง:</strong> เทียบสัดส่วนกลุ่ม "DSR-failure ที่เกิดแล้ว" (ผลลัพธ์) กับกลุ่ม "ภาระหนี้/เงินสำรอง/ความมั่นคงรายได้/ประวัติทางการเงิน" (ตัวกำหนดตามงานวิจัย PIER) เพื่อดูว่าสื่อรายงานเชิงสาเหตุ/เตือนล่วงหน้าหรือรายงานผลที่เกิดแล้วมากกว่ากัน
   </div>
   <footer>สร้างโดยอัตโนมัติ · เป็นภาพประกอบเชิงคุณภาพ ไม่ใช่ผลการวิเคราะห์เชิงสถิติ</footer>
 </div>
 <script>
   var GROUPS = __GROUPS_JSON__;
-  var CAT_COLOR_VAR = { core: '--c-core', happened: '--c-happened', warning: '--c-warning', policy: '--c-policy', direction: '--c-direction', other: '--c-other' };
+  var CAT_COLOR_VAR = {
+    core: '--c-core', dsr_failure: '--c-dsr_failure', debt_burden: '--c-debt_burden',
+    financial_cushion: '--c-financial_cushion', income_security: '--c-income_security',
+    financial_history: '--c-financial_history', debt_structure: '--c-debt_structure',
+    warning_general: '--c-warning_general', policy: '--c-policy', other: '--c-other'
+  };
   var root = document.getElementById('groups');
   GROUPS.forEach(function (g) {
     var maxCount = Math.max.apply(null, g.words.map(function (w) { return w.count; }));

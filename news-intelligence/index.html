@@ -5,20 +5,25 @@
     --bg: #F6F3EC; --surface: #FFFFFF; --ink: #1E2530; --ink-muted: #646F7C;
     --ink-faint: #9AA3AD; --rule: #DBD5C7;
     --c1: #B0512E; --c2: #2B6CB0; --c3: #6B8F3F; --c4: #8A6D3B; --c5: #7A4F8C; --c6: #9AA3AD;
+    --c7: #A24B4B; --c8: #3D8B8B; --c9: #C77B3B; --c10: #4B6FA5;
     --font-th: "Noto Sans Thai", "Sukhumvit Set", "Thonburi", "Leelawadee UI", sans-serif;
     --font-serif-th: "Noto Serif Thai", "Sukhumvit Set", Georgia, serif;
 
-    --track: #EDE9DD; --c-core: var(--c1); --c-happened: var(--c5); --c-warning: var(--c4); --c-policy: var(--c2); --c-direction: var(--c3); --c-other: var(--c6);
+    --track: #EDE9DD; --c-core: var(--c1); --c-dsr_failure: var(--c5); --c-debt_burden: var(--c7);
+    --c-financial_cushion: var(--c8); --c-income_security: var(--c9); --c-financial_history: var(--c10);
+    --c-debt_structure: var(--c3); --c-warning_general: var(--c4); --c-policy: var(--c2); --c-other: var(--c6);
   }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { 
       --bg: #171512; --surface: #201D19; --ink: #EDE8DF; --ink-muted: #A99E8D;
       --ink-faint: #776C5C; --rule: #3A342B;
       --c1: #E08556; --c2: #6CA6E0; --c3: #9FCB6F; --c4: #D2B26A; --c5: #C39BD9; --c6: #776C5C;
+      --c7: #D97B7B; --c8: #6FBFBF; --c9: #E0A56C; --c10: #8FAEDD;
  --track: #2A2520; } }
   :root[data-theme="dark"] { 
       --bg: #171512; --surface: #201D19; --ink: #EDE8DF; --ink-muted: #A99E8D;
       --ink-faint: #776C5C; --rule: #3A342B;
       --c1: #E08556; --c2: #6CA6E0; --c3: #9FCB6F; --c4: #D2B26A; --c5: #C39BD9; --c6: #776C5C;
+      --c7: #D97B7B; --c8: #6FBFBF; --c9: #E0A56C; --c10: #8FAEDD;
  --track: #2A2520; }
   * { box-sizing: border-box; }
   html, body { background: var(--bg); }
@@ -46,20 +51,25 @@
 <div class="wrap">
   <p class="eyebrow">Isan Household Financial Fragility Toolkit — อัปเดตอัตโนมัติรายเดือน</p>
   <h1>คำที่เกี่ยวกับความเปราะบางการเงินครัวเรือน — จัดอันดับตามความถี่</h1>
-  <p class="dek">วลี 1-3 คำที่เกี่ยวข้องกับหนี้/ความเปราะบางทางการเงิน จากพาดหัวข่าว 359 รายการ จัดกลุ่มตามความหมาย เรียงจากความถี่มากไปน้อยในแต่ละกลุ่ม</p>
+  <p class="dek">วลี 1-3 คำที่เกี่ยวข้องกับหนี้/ความเปราะบางทางการเงิน จากพาดหัวข่าว 359 รายการ จัดกลุ่มตามกรอบวิจัย Lusardi et al. (2011), Levy Institute fragility index, และ PIER DP 012 "Gauging Households' Debt Tolerance: Evidence from Thailand" เรียงจากความถี่มากไปน้อยในแต่ละกลุ่ม</p>
   <p class="source-note">อัปเดตอัตโนมัติทุกเดือนผ่าน GitHub Actions</p>
 
   <div id="groups"></div>
   <a class="forward" href="./wordcloud.html">ดูเป็น word cloud + pie chart →</a>
 
   <div class="callout">
-    <strong>อ่านยังไง:</strong> เทียบสัดส่วนกลุ่ม "สัญญาณเตือน" กับ "เกิดแล้ว" เพื่อดูว่าสื่อรายงานเชิงเตือนล่วงหน้าหรือรายงานผลที่เกิดแล้วมากกว่ากัน
+    <strong>อ่านยังไง:</strong> เทียบสัดส่วนกลุ่ม "DSR-failure ที่เกิดแล้ว" (ผลลัพธ์) กับกลุ่ม "ภาระหนี้/เงินสำรอง/ความมั่นคงรายได้/ประวัติทางการเงิน" (ตัวกำหนดตามงานวิจัย PIER) เพื่อดูว่าสื่อรายงานเชิงสาเหตุ/เตือนล่วงหน้าหรือรายงานผลที่เกิดแล้วมากกว่ากัน
   </div>
   <footer>สร้างโดยอัตโนมัติ · เป็นภาพประกอบเชิงคุณภาพ ไม่ใช่ผลการวิเคราะห์เชิงสถิติ</footer>
 </div>
 <script>
-  var GROUPS = [{"cat": "core", "label": "คำแกนหลัก", "words": [{"text": "หนี้", "count": 187}, {"text": "ครัวเรือน", "count": 118}]}, {"cat": "happened", "label": "เกิดแล้ว (already-happened distress)", "words": [{"text": "หนี้เสีย", "count": 16}, {"text": "NPL", "count": 9}, {"text": "SME", "count": 4}, {"text": "ทรุด", "count": 3}]}, {"cat": "warning", "label": "สัญญาณเตือน (early-warning language)", "words": [{"text": "วิกฤต", "count": 18}, {"text": "ห่วง", "count": 17}, {"text": "จับตา", "count": 13}, {"text": "ปัญหา", "count": 12}, {"text": "เปราะบาง", "count": 8}, {"text": "ปัญหาหนี้", "count": 7}, {"text": "น่าห่วง", "count": 7}, {"text": "วิกฤตหนี้", "count": 7}, {"text": "วิกฤตหนี้ครัวเรือน", "count": 6}, {"text": "ปัญหาหนี้ครัวเรือน", "count": 5}, {"text": "ความเสี่ยง", "count": 4}, {"text": "น่าห่วงแม้", "count": 3}, {"text": "ห่วงแม้ลดเหลือ", "count": 3}, {"text": "ห่วงหนี้ครัวเรือน", "count": 3}, {"text": "แก้กับดักหนี้", "count": 3}, {"text": "กับดักหนี้ครัวเรือน", "count": 3}, {"text": "ฝ่าวิกฤต", "count": 3}, {"text": "ครัวเรือนวิกฤต", "count": 3}]}, {"cat": "policy", "label": "ทางแก้ / มาตรการ (policy response)", "words": [{"text": "แก้หนี้", "count": 20}, {"text": "แก้หนี้ครัวเรือน", "count": 8}, {"text": "ปรับโครงสร้าง", "count": 6}, {"text": "ปรับโครงสร้างหนี้", "count": 5}, {"text": "ลดหนี้", "count": 4}, {"text": "มหกรรมไกล่เกลี่ยหนี้", "count": 3}, {"text": "มาตรการแก้หนี้", "count": 3}, {"text": "เยียวยา", "count": 3}]}, {"cat": "direction", "label": "ทิศทาง / ขนาด (trend & magnitude)", "words": [{"text": "ท่วม", "count": 8}, {"text": "หนี้ครัวเรือนพุ่ง", "count": 7}, {"text": "หนี้ท่วม", "count": 5}, {"text": "ครัวเรือนสูง", "count": 4}, {"text": "หนี้พุ่ง", "count": 4}, {"text": "หนี้สูง", "count": 3}, {"text": "หนี้ครัวเรือนสูง", "count": 3}, {"text": "น้ำท่วม", "count": 3}, {"text": "ก้อนเล็กท่วม", "count": 3}]}, {"cat": "other", "label": "อื่นๆ", "words": [{"text": "หนี้ครัวเรือน", "count": 107}, {"text": "ลด", "count": 38}, {"text": "ดอกเบี้ย", "count": 20}, {"text": "ครัวเรือนไทย", "count": 15}, {"text": "สินเชื่อ", "count": 15}, {"text": "หนี้ครัวเรือนไทย", "count": 14}, {"text": "นอกระบบ", "count": 10}, {"text": "เครดิตบูโร", "count": 10}, {"text": "ลดดอกเบี้ย", "count": 9}, {"text": "ชี้หนี้ครัวเรือน", "count": 8}, {"text": "หนี้นอกระบบ", "count": 6}, {"text": "กู้", "count": 6}, {"text": "ลูกหนี้", "count": 6}, {"text": "หนี้เฉลี่ย", "count": 4}, {"text": "สัดส่วนหนี้", "count": 4}, {"text": "หนี้ครัวเรือนปี", "count": 4}, {"text": "จ่ายหนี้", "count": 4}, {"text": "ลดลง", "count": 4}, {"text": "หนี้ครัวเรือนQ", "count": 3}, {"text": "หนี้ครัวเรือนแตะ", "count": 3}, {"text": "สัดส่วนหนี้ครัวเรือน", "count": 3}, {"text": "เตือนหนี้ครัวเรือน", "count": 3}, {"text": "ดอกเบี้ยขึ้น", "count": 3}, {"text": "หนี้สิน", "count": 3}, {"text": "สินเชื่อแบงก์", "count": 3}, {"text": "หนี้ครัวเรือนลด", "count": 3}, {"text": "หนี้ก้อนเล็ก", "count": 3}, {"text": "หนี้เกษตร", "count": 3}, {"text": "ลดฮวบ", "count": 3}]}];
-  var CAT_COLOR_VAR = { core: '--c-core', happened: '--c-happened', warning: '--c-warning', policy: '--c-policy', direction: '--c-direction', other: '--c-other' };
+  var GROUPS = [{"cat": "core", "label": "คำแกนหลัก", "words": [{"text": "หนี้", "count": 187}, {"text": "ครัวเรือน", "count": 118}]}, {"cat": "dsr_failure", "label": "DSR-failure ที่เกิดแล้ว (realized distress)", "words": [{"text": "หนี้เสีย", "count": 16}, {"text": "NPL", "count": 9}, {"text": "SME", "count": 4}, {"text": "ทรุด", "count": 3}]}, {"cat": "income_security", "label": "ความมั่นคงรายได้ (income security)", "words": [{"text": "เกษตรกร", "count": 5}]}, {"cat": "financial_history", "label": "ประวัติทางการเงิน (financial history)", "words": [{"text": "เครดิตบูโร", "count": 10}, {"text": "ประวัติการณ์", "count": 7}, {"text": "สูงสุดประวัติการณ์", "count": 3}]}, {"cat": "debt_structure", "label": "โครงสร้างหนี้ (debt structure / leverage)", "words": [{"text": "สัดส่วนหนี้", "count": 4}, {"text": "สัดส่วนหนี้ครัวเรือน", "count": 3}]}, {"cat": "warning_general", "label": "สัญญาณเตือนทั่วไป (general warning sentiment)", "words": [{"text": "วิกฤต", "count": 18}, {"text": "ห่วง", "count": 17}, {"text": "จับตา", "count": 13}, {"text": "ปัญหา", "count": 12}, {"text": "เปราะบาง", "count": 8}, {"text": "ปัญหาหนี้", "count": 7}, {"text": "น่าห่วง", "count": 7}, {"text": "วิกฤตหนี้", "count": 7}, {"text": "วิกฤตหนี้ครัวเรือน", "count": 6}, {"text": "ปัญหาหนี้ครัวเรือน", "count": 5}, {"text": "ความเสี่ยง", "count": 4}, {"text": "น่าห่วงแม้", "count": 3}, {"text": "ห่วงแม้ลดเหลือ", "count": 3}, {"text": "ห่วงหนี้ครัวเรือน", "count": 3}, {"text": "แก้กับดักหนี้", "count": 3}, {"text": "กับดักหนี้ครัวเรือน", "count": 3}, {"text": "ฝ่าวิกฤต", "count": 3}, {"text": "ครัวเรือนวิกฤต", "count": 3}]}, {"cat": "policy", "label": "ทางแก้ / มาตรการ (policy response)", "words": [{"text": "แก้หนี้", "count": 20}, {"text": "แก้หนี้ครัวเรือน", "count": 8}, {"text": "ปรับโครงสร้าง", "count": 6}, {"text": "ปรับโครงสร้างหนี้", "count": 5}, {"text": "ลดหนี้", "count": 4}, {"text": "มหกรรมไกล่เกลี่ยหนี้", "count": 3}, {"text": "มาตรการแก้หนี้", "count": 3}]}, {"cat": "other", "label": "อื่นๆ", "words": [{"text": "หนี้ครัวเรือน", "count": 107}, {"text": "ลด", "count": 38}, {"text": "ดอกเบี้ย", "count": 20}, {"text": "GDP", "count": 18}, {"text": "ครัวเรือนไทย", "count": 15}, {"text": "สินเชื่อ", "count": 15}, {"text": "หนี้ครัวเรือนไทย", "count": 14}, {"text": "นอกระบบ", "count": 10}, {"text": "ลดดอกเบี้ย", "count": 9}, {"text": "รายได้", "count": 9}, {"text": "ชี้หนี้ครัวเรือน", "count": 8}, {"text": "ท่วม", "count": 8}, {"text": "หนี้ครัวเรือนพุ่ง", "count": 7}, {"text": "หนี้นอกระบบ", "count": 6}, {"text": "กู้", "count": 6}, {"text": "ลูกหนี้", "count": 6}, {"text": "หนี้ท่วม", "count": 5}, {"text": "หนี้เฉลี่ย", "count": 4}, {"text": "ครัวเรือนสูง", "count": 4}, {"text": "หนี้ครัวเรือนปี", "count": 4}, {"text": "จ่ายหนี้", "count": 4}, {"text": "หนี้พุ่ง", "count": 4}, {"text": "ลดลง", "count": 4}, {"text": "หนี้สูง", "count": 3}, {"text": "หนี้ครัวเรือนQ", "count": 3}, {"text": "หนี้ครัวเรือนสูง", "count": 3}, {"text": "หนี้ครัวเรือนแตะ", "count": 3}, {"text": "เตือนหนี้ครัวเรือน", "count": 3}, {"text": "ดอกเบี้ยขึ้น", "count": 3}, {"text": "หนี้สิน", "count": 3}, {"text": "น้ำท่วม", "count": 3}, {"text": "สินเชื่อแบงก์", "count": 3}, {"text": "หนี้ครัวเรือนลด", "count": 3}]}];
+  var CAT_COLOR_VAR = {
+    core: '--c-core', dsr_failure: '--c-dsr_failure', debt_burden: '--c-debt_burden',
+    financial_cushion: '--c-financial_cushion', income_security: '--c-income_security',
+    financial_history: '--c-financial_history', debt_structure: '--c-debt_structure',
+    warning_general: '--c-warning_general', policy: '--c-policy', other: '--c-other'
+  };
   var root = document.getElementById('groups');
   GROUPS.forEach(function (g) {
     var maxCount = Math.max.apply(null, g.words.map(function (w) { return w.count; }));
